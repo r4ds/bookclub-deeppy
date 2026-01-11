@@ -1,0 +1,36 @@
+project:
+  type: website
+  pre-render: generate_chapters.R
+  render:
+  - slides/*
+  - videos/*
+  - '*.qmd'
+format:
+  html:
+    theme:
+      dark: darkly
+      light: flatly
+    css: styles.css
+    toc: false
+    link-external-newwindow: true
+execute:
+  freeze: auto
+website:
+  title: Deep Learning with Python (3e) Book Club
+  sidebar:
+    style: docked
+    search: true
+    tools:
+    - icon: github
+      href: https://github.com/r4ds/bookclub-deeppy
+    - icon: youtube
+      href: https://dslc.video/deeppy
+    - icon: mastodon
+      href: https://fosstodon.org/@DSLC
+    - icon: linkedin
+      href: https://www.linkedin.com/company/dslc-io
+    contents:
+    - index.qmd
+    - file: slides/00.qmd
+      target: deeppy_club-slides
+    - 01.qmd

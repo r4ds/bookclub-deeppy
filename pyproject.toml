@@ -1,0 +1,6 @@
+[project]
+name = "bookclub-deeppy"
+version = "0.1.0"
+description = "Deep Learning with Python Book Club"
+readme = "README.md"
+requires-python = ">=3.11"

@@ -1,0 +1,16 @@
+---
+title: What is deep learning?
+---
+
+## Learning objectives
+
+-   PLACE LOS HERE
+
+## ASSERTION ABOUT WHAT THIS SLIDE SHOWS
+
+EVIDENCE BACKING UP THE ASSERTION
+
+::: notes
+- You can add notes on each slide with blocks like this!
+- Load a deck in the browser and type "s" to see these notes.
+:::

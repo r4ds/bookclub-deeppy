@@ -1,0 +1,22 @@
+number,title,number_wide
+0,Club meetings,00
+1,What is deep learning?,01
+2,The mathematical building blocks of neural networks,02
+3,"Introduction to TensorFlow, PyTorch, JAX, and Keras",03
+4,Classification and regression,04
+5,Fundamentals of machine learning,05
+6,The universal workflow of machine learning,06
+7,A deep dive on Keras,07
+8,Image classification,08
+9,ConvNet architecture patterns,09
+10,Interpreting what ConvNets learn,10
+11,Image segmentation,11
+12,Object detection,12
+13,Timeseries forecasting,13
+14,Text classification,14
+15,Language models and the Transformer,15
+16,Text generation,16
+17,Image generation,17
+18,Best practices for the real world,18
+19,The future of AI,19
+20,Conclusions,20
