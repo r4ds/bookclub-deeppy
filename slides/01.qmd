@@ -50,6 +50,21 @@ title: What is deep learning?
 - What kinds of problems are still better suited to classical programming?
 :::
 
+## ML vs statistical inference
+
+| | Inference | ML |
+|---|---|---|
+| **Goal** | Estimate parameters + uncertainty | Predictions/generalization |
+| **Models** | Theory-driven, causal | Flexible, data-driven |
+| **Sweet spot** | Small n | Large n |
+
+::: notes
+- **Goal**: Inference cares about parameter values — "What is β? Is it significantly different from 0? What's the 95% CI?" ML doesn't care about parameters (millions of meaningless weights) — only whether predictions are accurate on held-out data.
+- **Models**: Inference builds models from domain knowledge (e.g., linear model because theory says X causes Y). ML uses flexible models (neural nets, trees) that learn structure from data.
+- **Sweet spot**: With small n, you need strong assumptions to learn anything. With large n, you can let the data speak.
+- Many modern methods blur the line (regularization, Bayesian ML, causal ML)
+:::
+
 ## The three ingredients of ML
 
 1. **Input data points** — Images, text, audio, tabular data...
@@ -79,7 +94,7 @@ A different way to look at/encode data that makes a task easier.
 
 ## The "deep" in deep learning
 
-- Not "deeper understanding" — **successive layers** of representations
+- Refers to **successive layers** of representations
 - Tens to hundreds of layers, all learned automatically
 - A.k.a. "layered representations learning" or "hierarchical representations learning"
 
