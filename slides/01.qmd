@@ -12,7 +12,7 @@ title: What is deep learning?
 
 ## The nested circles
 
-![](https://deeplearningwithpython.io/images/ch01/ai-ml-dl.07201556.png){fig-align="center"}
+![Nested circles labeled AI, ML, and DL.](images/ai-ml-dl.png){fig-align="center"}
 
 - **AI**: Effort to automate intellectual tasks (includes non-learning approaches)
 - **ML**: Learning rules from data instead of programming them
@@ -40,7 +40,7 @@ title: What is deep learning?
 
 ## Classical programming vs ML
 
-![](https://deeplearningwithpython.io/images/ch01/a-new-programming-paradigm.e8d1a1c2.png){fig-align="center"}
+![Classical programming vs ML workflow diagram.](images/a-new-programming-paradigm.png){fig-align="center"}
 
 - Classical: Human writes rules → Computer applies rules
 - ML: Computer observes data + answers → Computer learns rules
@@ -82,7 +82,7 @@ The third ingredient is crucial: the **feedback signal** drives learning.
 
 A different way to look at/encode data that makes a task easier.
 
-![](https://deeplearningwithpython.io/images/ch01/learning_representations.97fa3c4b.png){fig-align="center"}
+![Representation learning transforms data coordinates.](images/learning_representations.png){fig-align="center"}
 
 - Same data, different coordinate system
 - Black vs white becomes a simple rule: `x > 0`
@@ -106,28 +106,28 @@ A different way to look at/encode data that makes a task easier.
 - The brain connection is overhyped — it's really just math
 :::
 
-## How it works: Three figures
+## How it works: Three figures (1/3)
 
-**1. Weights parameterize each layer**
+**Weights parameterize each layer**
 
-![](https://deeplearningwithpython.io/images/ch01/deep-learning-in-3-figures-1.55e5a910.png){fig-align="center" height="300"}
+![Neural network layer with weights and parameters.](images/deep-learning-in-3-figures-1.png){fig-align="center" height="300"}
 
 - Learning = finding good values for millions of parameters
 
-## How it works: Three figures
+## How it works: Three figures (2/3)
 
-**2. Loss function measures quality**
+**Loss function measures quality**
 
-![](https://deeplearningwithpython.io/images/ch01/deep-learning-in-3-figures-2.bb3cebc2.png){fig-align="center" height="300"}
+![Loss function measuring prediction error.](images/deep-learning-in-3-figures-2.png){fig-align="center" height="300"}
 
 - Distance between predictions and targets
 - Also called: objective function, cost function
 
-## How it works: Three figures
+## How it works: Three figures (3/3)
 
-**3. Optimizer adjusts weights using the loss**
+**Optimizer adjusts weights using the loss**
 
-![](https://deeplearningwithpython.io/images/ch01/deep-learning-in-3-figures-3.de178fa4.png){fig-align="center" height="300"}
+![Optimizer updates weights via backpropagation.](images/deep-learning-in-3-figures-3.png){fig-align="center" height="300"}
 
 - **Backpropagation**: the central algorithm
 - Training loop: repeat until loss is minimized
