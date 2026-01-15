@@ -4,13 +4,237 @@ title: What is deep learning?
 
 ## Learning objectives
 
--   PLACE LOS HERE
+-   Distinguish between AI, machine learning, and deep learning
+-   Explain how ML differs from classical programming
+-   Describe what "deep" means in deep learning
+-   Identify the core components: weights, loss function, optimizer
+-   Discuss the current state and realistic expectations for AI
 
-## ASSERTION ABOUT WHAT THIS SLIDE SHOWS
+## The nested circles
 
-EVIDENCE BACKING UP THE ASSERTION
+![](https://deeplearningwithpython.io/images/ch01/ai-ml-dl.07201556.png){fig-align="center"}
+
+- **AI**: Effort to automate intellectual tasks (includes non-learning approaches)
+- **ML**: Learning rules from data instead of programming them
+- **DL**: Learning successive layers of representations
 
 ::: notes
-- You can add notes on each slide with blocks like this!
-- Load a deck in the browser and type "s" to see these notes.
+- Symbolic AI dominated 1950s-1980s (expert systems, chess)
+- Failed on "fuzzy" problems: images, speech, language
+- Key question: Where does each approach make sense today?
+:::
+
+## Lady Lovelace's Objection
+
+> "The Analytical Engine has no pretensions whatever to originate anything. It can do whatever we know how to order it to perform."
+> — Ada Lovelace, 1843
+
+- Turing quoted this in his 1950 paper on AI
+- **The question**: Can machines truly *learn*, or only follow instructions?
+- **ML's answer**: Flip the script!
+
+::: notes
+- Discussion: Does modern AI "originate" anything? What would that mean?
+- LLMs: Are they originating or pattern-matching at scale?
+:::
+
+## Classical programming vs ML
+
+![](https://deeplearningwithpython.io/images/ch01/a-new-programming-paradigm.e8d1a1c2.png){fig-align="center"}
+
+- Classical: Human writes rules → Computer applies rules
+- ML: Computer observes data + answers → Computer learns rules
+
+::: notes
+- "Trained rather than explicitly programmed"
+- What kinds of problems are still better suited to classical programming?
+:::
+
+## The three ingredients of ML
+
+1. **Input data points** — Images, text, audio, tabular data...
+2. **Expected outputs** — Labels, transcriptions, categories...
+3. **A way to measure success** — How far off are we?
+
+The third ingredient is crucial: the **feedback signal** drives learning.
+
+::: notes
+- This is where the term "supervised learning" comes from
+- What happens when you don't have labeled data? (self-supervised, unsupervised)
+:::
+
+## What's a "representation"?
+
+A different way to look at/encode data that makes a task easier.
+
+![](https://deeplearningwithpython.io/images/ch01/learning_representations.97fa3c4b.png){fig-align="center"}
+
+- Same data, different coordinate system
+- Black vs white becomes a simple rule: `x > 0`
+
+::: notes
+- ML = searching for useful representations + rules
+- "Hypothesis space" = the set of transformations we search through
+:::
+
+## The "deep" in deep learning
+
+- Not "deeper understanding" — **successive layers** of representations
+- Tens to hundreds of layers, all learned automatically
+- A.k.a. "layered representations learning" or "hierarchical representations learning"
+
+> "A multistage information-distillation process"
+
+::: notes
+- Shallow learning: 1-2 layers, often needed hand-crafted features
+- Neural networks: layers stacked, inspired (loosely!) by biology
+- The brain connection is overhyped — it's really just math
+:::
+
+## How it works: Three figures
+
+**1. Weights parameterize each layer**
+
+![](https://deeplearningwithpython.io/images/ch01/deep-learning-in-3-figures-1.55e5a910.png){fig-align="center" height="300"}
+
+- Learning = finding good values for millions of parameters
+
+## How it works: Three figures
+
+**2. Loss function measures quality**
+
+![](https://deeplearningwithpython.io/images/ch01/deep-learning-in-3-figures-2.bb3cebc2.png){fig-align="center" height="300"}
+
+- Distance between predictions and targets
+- Also called: objective function, cost function
+
+## How it works: Three figures
+
+**3. Optimizer adjusts weights using the loss**
+
+![](https://deeplearningwithpython.io/images/ch01/deep-learning-in-3-figures-3.de178fa4.png){fig-align="center" height="300"}
+
+- **Backpropagation**: the central algorithm
+- Training loop: repeat until loss is minimized
+
+## What makes deep learning different?
+
+| Property | Why it matters |
+|----------|----------------|
+| **Simplicity** | Automates feature engineering — no hand-crafting |
+| **Scalability** | GPUs + batching = arbitrary dataset sizes |
+| **Versatility** | Models are reusable, can do online learning |
+
+::: notes
+- Foundation models: train once, use everywhere
+- Transfer learning changed the economics of ML
+:::
+
+## The age of generative AI
+
+- ChatGPT, Gemini, Claude, Midjourney...
+- **Foundation models**: huge, trained on massive unlabeled data
+- **Self-supervised learning**: targets come from the input itself
+  - Predict next word, reconstruct noisy images
+
+> These models work as a "fuzzy database of human knowledge"
+
+::: notes
+- Generative AI ideas date back to the 1990s
+- The first edition of this book (2017) had a "Generative AI" chapter!
+:::
+
+## What DL has achieved
+
+- Fluent chatbots & programming assistants (Copilot!)
+- Photorealistic image generation
+- Human-level: image classification, speech/handwriting transcription
+- Dramatically improved translation & text-to-speech
+- Autonomous driving deployed in multiple cities
+- Superhuman game playing (Go, Chess, Poker)
+
+::: notes
+- Discussion: Which of these surprised you most?
+- Which still has the most room to grow?
+:::
+
+## Beware the hype
+
+**2023 predictions that didn't pan out:**
+
+- "No one needs to work anymore!"
+- 10x-100x productivity gains imminent
+- Mass unemployment within a year
+
+**Reality (mid-2025):**
+
+- Tens of billions in revenue — impressive!
+- But doesn't yet dent overall economy
+- Investment ($100B+) >> Revenue (~$10B)
+
+::: notes
+- AGI predictions: Minsky (1967), OpenAI's 2016 pitch, now again in 2023
+- Pattern: Overpromise → disappointment → "AI winter"?
+:::
+
+## Cartoon vs living being
+
+> "AI is like a cartoon character, while intelligence is like a living being."
+
+- **Cartoon**: Can only act out scenes it was drawn for
+- **Living being**: Adapts to the unexpected
+
+**Key difference: Adaptability**
+
+- Intelligence = facing the unknown, adapting, learning from it
+- Automation = handles only what it's trained for
+
+::: notes
+- This is Chollet's key argument against AGI hype
+- Discussion: Do you agree? Can scaling solve this?
+:::
+
+## AI Winters: A history
+
+| Era | Hype | Crash |
+|-----|------|-------|
+| 1960s | Symbolic AI → AGI in "a generation" | 1970s: First AI winter |
+| 1980s | Expert systems boom | Early 1990s: Second AI winter |
+| 2020s | Generative AI, AGI soon? | ??? |
+
+- Author's view: Unlikely to be a *full* retreat, but some "air" will come out
+
+::: notes
+- Minsky 1967: AGI within a generation
+- Minsky 1970: General intelligence in 3-8 years
+- OpenAI 2016: AGI by 2020
+:::
+
+## The long-term promise
+
+From the book (written in 2017, now validated):
+
+> "AI will be your assistant... help educate your kids... watch over your health... be your interface to an increasingly complex world."
+
+**2025 reality:**
+
+- ChatGPT/Claude: Top use = homework help!
+- AlphaFold transforming biology
+- Terence Tao: AI as "reliable co-author" by ~2026
+
+::: notes
+- Don't believe short-term hype, DO believe long-term vision
+- Like internet in 1995: hard to see impact before deployment
+:::
+
+## Discussion questions
+
+1. Where's the line between "trained" and "programmed"?
+2. Is self-supervised learning fundamentally different from supervised?
+3. What would convince you that a system has "true intelligence"?
+4. Are we in another hype cycle? What's different this time?
+5. What's one thing DL *shouldn't* be applied to?
+
+::: notes
+- These are meant to spark discussion, not have right answers!
 :::
