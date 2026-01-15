@@ -1,5 +1,8 @@
 ---
 title: What is deep learning?
+format:
+  revealjs:
+    footer: '<a href="/" target="deeppy_club-index">DSLC.io/deeppy</a> | <a href="https://DSLC.io" target="_blank">DSLC.io</a> | Images: <a href="https://deeplearningwithpython.io" target="_blank">deeplearningwithpython.io</a>'
 ---
 
 ## Learning objectives
