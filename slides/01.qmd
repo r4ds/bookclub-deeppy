@@ -8,8 +8,6 @@ format:
 ## Learning objectives
 
 -   Distinguish between AI, machine learning, and deep learning
--   Explain how ML differs from classical programming
--   Describe what "deep" means in deep learning
 -   Identify the core components: weights, loss function, optimizer
 -   Discuss the current state and realistic expectations for AI
 
@@ -27,19 +25,6 @@ format:
 - Key question: Where does each approach make sense today?
 :::
 
-## Lady Lovelace's Objection
-
-> "The Analytical Engine has no pretensions whatever to originate anything. It can do whatever we know how to order it to perform."
-> — Ada Lovelace, 1843
-
-- Turing quoted this in his 1950 paper on AI
-- **The question**: Can machines truly *learn*, or only follow instructions?
-- **ML's answer**: Flip the script!
-
-::: notes
-- Discussion: Does modern AI "originate" anything? What would that mean?
-- LLMs: Are they originating or pattern-matching at scale?
-:::
 
 ## Classical programming vs ML
 
@@ -81,9 +66,11 @@ The third ingredient is crucial: the **feedback signal** drives learning.
 - What happens when you don't have labeled data? (self-supervised, unsupervised)
 :::
 
-## What's a "representation"?
+## Representations
 
-A different way to look at/encode data that makes a task easier.
+- ML works by finding meaningful **representations** of the data
+
+- Representations are transformations/encodings of data that makes a task easier.
 
 ![Representation learning transforms data coordinates.](images/learning_representations.png){fig-align="center"}
 
@@ -97,9 +84,10 @@ A different way to look at/encode data that makes a task easier.
 
 ## The "deep" in deep learning
 
+![Deep learning](images/mnist_representations.png){fig-align="center"}
+
 - Refers to **successive layers** of representations
 - Tens to hundreds of layers, all learned automatically
-- A.k.a. "layered representations learning" or "hierarchical representations learning"
 
 > "A multistage information-distillation process"
 
@@ -150,10 +138,10 @@ A different way to look at/encode data that makes a task easier.
 
 ## The age of generative AI
 
-- ChatGPT, Gemini, Claude, Midjourney...
-- **Foundation models**: huge, trained on massive unlabeled data
 - **Self-supervised learning**: targets come from the input itself
   - Predict next word, reconstruct noisy images
+- ChatGPT, Gemini, Claude, Midjourney...
+- **Foundation models**: huge, trained on massive unlabeled data
 
 > These models work as a "fuzzy database of human knowledge"
 
@@ -164,8 +152,8 @@ A different way to look at/encode data that makes a task easier.
 
 ## What DL has achieved
 
-- Fluent chatbots & programming assistants (Copilot!)
-- Photorealistic image generation
+- Fluent chatbots & programming assistants (Copilot, Claude code)
+- Photorealistic image and video generation
 - Human-level: image classification, speech/handwriting transcription
 - Dramatically improved translation & text-to-speech
 - Autonomous driving deployed in multiple cities
@@ -186,26 +174,23 @@ A different way to look at/encode data that makes a task easier.
 
 **Reality (mid-2025):**
 
-- Tens of billions in revenue — impressive!
-- But doesn't yet dent overall economy
-- Investment ($100B+) >> Revenue (~$10B)
+- Tens of billions in revenue! 
+- Openai alone 20B revenue in 2025
+- Investment  >> Revenue >> Profits
 
 ::: notes
 - AGI predictions: Minsky (1967), OpenAI's 2016 pitch, now again in 2023
 - Pattern: Overpromise → disappointment → "AI winter"?
 :::
 
-## Cartoon vs living being
+## AGI soon?
 
-> "AI is like a cartoon character, while intelligence is like a living being."
+- AI: 'Cognitive Automation' = handles only what it's trained for
+- Intelligence : 'Cognitive autonomy'= facing the unknown, adapting, learning from it
 
-- **Cartoon**: Can only act out scenes it was drawn for
-- **Living being**: Adapts to the unexpected
+> "AI is like a cartoon character, while intelligence is like a living being.  A cartoon, no matter how realistic, can only act out the scenes it was drawn for"
 
-**Key difference: Adaptability**
 
-- Intelligence = facing the unknown, adapting, learning from it
-- Automation = handles only what it's trained for
 
 ::: notes
 - This is Chollet's key argument against AGI hype
@@ -230,28 +215,23 @@ A different way to look at/encode data that makes a task easier.
 
 ## The long-term promise
 
-From the book (written in 2017, now validated):
+From previous edition of this book book (written in 2017):
 
 > "AI will be your assistant... help educate your kids... watch over your health... be your interface to an increasingly complex world."
 
 **2025 reality:**
 
-- ChatGPT/Claude: Top use = homework help!
+- ChatGPT/Claude agents help write code (and homeowrk!)
+- Waymo's a common site in my city (Phoenix)
 - AlphaFold transforming biology
-- Terence Tao: AI as "reliable co-author" by ~2026
+- Terence Tao: AI as "reliable co-author" in mathematics by ~2026
 
-::: notes
-- Don't believe short-term hype, DO believe long-term vision
-- Like internet in 1995: hard to see impact before deployment
-:::
 
 ## Discussion questions
 
-1. Where's the line between "trained" and "programmed"?
-2. Is self-supervised learning fundamentally different from supervised?
-3. What would convince you that a system has "true intelligence"?
-4. Are we in another hype cycle? What's different this time?
-5. What's one thing DL *shouldn't* be applied to?
+1. Is self-supervised learning fundamentally different from supervised?
+2. What's one thing DL *shouldn't* be applied to?
+3. Are we in another hype cycle? What's different this time?
 
 ::: notes
 - These are meant to spark discussion, not have right answers!
