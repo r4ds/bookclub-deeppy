@@ -228,7 +228,8 @@ From previous edition of this book (written in 2017):
 
 **2025 reality:**
 
-- Long-term outlook is bright, but deployment is still early (internet-1995 analogy)
+- Well… we know how that turned out so far!
+- ... but maybe we’re still “internet in 1995”
 
 
 ## Discussion questions
