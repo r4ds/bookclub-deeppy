@@ -68,14 +68,12 @@ The third ingredient is crucial: the **feedback signal** drives learning.
 
 ## Representations
 
-- ML works by finding meaningful **representations** of the data
-
-- Representations are transformations/encodings of data that makes a task easier.
+- A **representation** is just a different way to look at/encode data that makes a task easier.
+- ML works by finding these useful representations automatically
 
 ![Representation learning transforms data coordinates.](images/learning_representations.png){fig-align="center"}
 
-- Same data, different coordinate system
-- Black vs white becomes a simple rule: `x > 0`
+- Separating black vs white becomes a simple rule: `x > 0`
 
 ::: notes
 - ML = searching for useful representations + rules
