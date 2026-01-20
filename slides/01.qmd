@@ -56,7 +56,7 @@ format:
 ## The three ingredients of ML
 
 1. **Input data points** — Images, text, audio, tabular data...
-2. **Expected outputs** — Labels, transcriptions, categories...
+2. **Examples outputs** — Labels, transcriptions, categories...
 3. **A way to measure success** — How far off are we?
 
 The third ingredient is crucial: the **feedback signal** drives learning.
@@ -213,14 +213,14 @@ The third ingredient is crucial: the **feedback signal** drives learning.
 
 ## The long-term promise
 
-From previous edition of this book book (written in 2017):
+From previous edition of this book (written in 2017):
 
 > "AI will be your assistant... help educate your kids... watch over your health... be your interface to an increasingly complex world."
 
 **2025 reality:**
 
 - ChatGPT/Claude agents help write code (and homeowrk!)
-- Waymo's a common site in my city (Phoenix)
+- Waymo is a common sight in my city (Phoenix)
 - AlphaFold transforming biology
 - Terence Tao: AI as "reliable co-author" in mathematics by ~2026
 
