@@ -22,7 +22,7 @@ title: Club meetings
 -   Presentations: 
     -   Review of material
     -   Questions you have
-    -   Maybe live demo
+    -   Maybe live demo (Google Colab)
 
 ## How to edit the slides: 
 

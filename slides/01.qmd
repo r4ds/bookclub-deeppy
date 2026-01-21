@@ -4,13 +4,237 @@ title: What is deep learning?
 
 ## Learning objectives
 
--   PLACE LOS HERE
+-   Distinguish between AI, machine learning, and deep learning
+-   Identify the core components: weights, loss function, optimizer
+-   Discuss the current state and realistic expectations for AI
 
-## ASSERTION ABOUT WHAT THIS SLIDE SHOWS
+## The nested circles
 
-EVIDENCE BACKING UP THE ASSERTION
+![Nested circles labeled AI, ML, and DL.](images/ai-ml-dl.png){fig-align="center"}
+
+- **AI**: Effort to automate intellectual tasks (includes non-learning approaches)
+- **ML**: Learning rules from data instead of programming them
+- **DL**: Learning successive layers of representations
 
 ::: notes
-- You can add notes on each slide with blocks like this!
-- Load a deck in the browser and type "s" to see these notes.
+- Symbolic AI dominated 1950s-1980s (expert systems, chess)
+- Failed on "fuzzy" problems: images, speech, language
+- Key question: Where does each approach make sense today?
+:::
+
+
+## Classical programming vs ML
+
+![Classical programming vs ML workflow diagram.](images/a-new-programming-paradigm.png){fig-align="center"}
+
+- Classical: Human writes rules → Computer applies rules
+- ML: Computer observes data + answers → Computer learns rules
+
+::: notes
+- "Trained rather than explicitly programmed"
+- What kinds of problems are still better suited to classical programming?
+:::
+
+## ML vs statistical inference
+
+| | Inference | ML |
+|---|---|---|
+| **Goal** | Estimate parameters + uncertainty | Predictions/generalization |
+| **Models** | Theory-driven, causal | Flexible, data-driven |
+| **Data regime** | Small n, strong assumptions | Large n, weaker assumptions |
+
+::: notes
+- **Goal**: Inference cares about parameter values — "What is β? Is it significantly different from 0? What's the 95% CI?" ML doesn't care about parameters (millions of meaningless weights) — only whether predictions are accurate on held-out data.
+- **Models**: Inference builds models from domain knowledge (e.g., linear model because theory says X causes Y). ML uses flexible models (neural nets, trees) that learn structure from data.
+- **Sweet spot**: With small n, you need strong assumptions to learn anything. With large n, you can let the data speak.
+- Many modern methods blur the line (regularization, Bayesian ML, causal ML)
+:::
+
+## The three ingredients of ML
+
+1. **Input data points** — Images, text, audio, tabular data...
+2. **Example outputs** — Labels, transcriptions, categories...
+3. **A way to measure success** — How far off are we?
+
+The third ingredient is crucial: the **feedback signal** drives learning.
+
+::: notes
+- This is where the term "supervised learning" comes from
+- What happens when you don't have labeled data? (self-supervised, unsupervised)
+:::
+
+## Representations
+
+- A **representation** is just a different way to look at/encode data that makes a task easier.
+- ML works by finding these useful representations automatically
+
+![Representation learning transforms data coordinates.](images/learning_representations.png){fig-align="center"}
+
+- Separating black vs white becomes a simple rule: `x > 0`
+
+::: notes
+- ML = searching for useful representations + rules
+- "Hypothesis space" = the set of transformations we search through
+:::
+
+## The "deep" in deep learning
+
+![Deep learning](images/mnist_representations.png){fig-align="center"}
+
+- Refers to **successive layers** of representations
+- Tens to hundreds of layers, all learned automatically
+
+> "A multistage information-distillation process"
+
+::: notes
+- The book is explicit: DL is not modeled on the brain; treat it as math
+- Shallow learning: 1-2 layers, often needed hand-crafted features
+- Neural networks: layers stacked, inspired (loosely!) by biology
+- The brain connection is overhyped — it's really just math
+:::
+
+## How it works: Three figures (1/3)
+
+**Weights parameterize each layer**
+
+![Neural network layer with weights and parameters.](images/deep-learning-in-3-figures-1.png){fig-align="center" height="300"}
+
+- Learning = finding good values for millions of parameters
+
+## How it works: Three figures (2/3)
+
+**Loss function measures quality**
+
+![Loss function measuring prediction error.](images/deep-learning-in-3-figures-2.png){fig-align="center" height="300"}
+
+- Distance between predictions and targets
+- Also called: objective function, cost function
+
+## How it works: Three figures (3/3)
+
+**Optimizer adjusts weights using the loss**
+
+![Optimizer updates weights via backpropagation.](images/deep-learning-in-3-figures-3.png){fig-align="center" height="300"}
+
+- **Backpropagation**: the central algorithm
+- Training loop: repeat to reduce loss
+
+::: notes
+- Random initialization + repeated updates are what make the loop work
+:::
+
+## What makes deep learning different?
+
+| Property | Why it matters |
+|----------|----------------|
+| **Simplicity** | Automates feature engineering — no hand-crafting |
+| **Scalability** | GPUs + batching enable much larger datasets |
+| **Versatility** | Models are reusable, can do online learning |
+
+::: notes
+- Foundation models: train once, use everywhere
+- Transfer learning changed the economics of ML
+- End-to-end DL replaces multistage pipelines that needed hand-crafted features
+:::
+
+## The age of generative AI
+
+- **Self-supervised learning**: targets come from the input itself
+  - Predict next word, reconstruct noisy images
+- ChatGPT, Gemini, Claude, Midjourney...
+- **Foundation models**: huge, trained on massive unlabeled data
+
+> These models work as a "fuzzy database of human knowledge"
+
+::: notes
+- Generative AI ideas date back to the 1990s
+- The first edition of this book (2017) had a "Generative AI" chapter!
+- Foundation models learn by reconstructing inputs (next-word, denoising)
+- Scale note: hundreds of billions of params, >1PB data, tens of $M to train
+:::
+
+## What DL has achieved
+
+- Fluent chatbots & programming assistants (ChatGPT, Gemini, GitHub Copilot)
+- Photorealistic image and video generation
+- Human-level: image classification, speech/handwriting transcription
+- Dramatically improved translation & text-to-speech
+- Autonomous driving deployed in Phoenix, San Francisco, Los Angeles, and Austin (as of 2025)
+- Superhuman game playing (Go, Chess, Poker)
+
+::: notes
+- Discussion: Which of these surprised you most?
+- Which still has the most room to grow?
+:::
+
+## Beware the hype
+
+**2023 predictions that didn't pan out:**
+
+- "No one needs to work anymore!"
+- 10x-100x productivity gains imminent
+- Mass unemployment within a year
+
+**Reality (mid-2025):**
+
+- "Tens of billions" in generative AI revenue (overall)
+- AI investment surpasses $100B annually, revenue closer to $10B
+
+::: notes
+- AGI predictions: Minsky (1967), OpenAI's 2016 pitch, now again in 2023
+- Pattern: Overpromise → disappointment → "AI winter"?
+:::
+
+## AGI soon?
+
+- AI: "Cognitive automation" = handles only what it's trained for
+- Intelligence: "Cognitive autonomy" = facing the unknown, adapting, learning from it
+
+> "Think of it this way: AI is like a cartoon character, while intelligence is like a living being. A cartoon, no matter how realistic, can only act out the scenes it was drawn for."
+
+
+
+::: notes
+- This is Chollet's key argument against AGI hype
+- 2013–2015: near-term AGI fear helped motivate OpenAI's founding (2015)
+- OpenAI's 2016 recruiting pitch: AGI by 2020
+- Discussion: Do you agree? Can scaling solve this?
+:::
+
+## AI Winters: A history
+
+| Era | Hype | Crash |
+|-----|------|-------|
+| 1960s | Symbolic AI → AGI in "a generation" | 1970s: First AI winter |
+| 1980s | Expert systems boom | Early 1990s: Second AI winter |
+| 2020s | Generative AI, AGI soon? | ??? |
+
+- Author's view: Unlikely to be a *full* retreat, but some "air" will come out
+
+::: notes
+- Minsky 1967: AGI within a generation
+- Minsky 1970: General intelligence in 3-8 years
+- OpenAI 2016: AGI by 2020
+:::
+
+## The long-term promise
+
+From the previous edition of this book (written in 2017):
+
+> "AI will be your assistant... help educate your kids... watch over your health... be your interface to an increasingly complex world."
+
+**2025 reality:**
+
+- Well… we know how that turned out so far!
+- ... but maybe we’re still “internet in 1995”
+
+
+## Discussion questions
+
+1. Is self-supervised learning fundamentally different from supervised?
+2. What's one thing DL *shouldn't* be applied to?
+3. Are we in another hype cycle? What's different this time?
+
+::: notes
+- These are meant to spark discussion, not have right answers!
 :::
