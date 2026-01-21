@@ -6,8 +6,8 @@
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="../site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.8.26">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-4d9afe2b8d18ee9fa5d0d57b5ed4214d.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.27">
 
   <title>Deep Learning with Python (3e) Book Club – What is deep learning?</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -135,16 +135,480 @@
 <section id="learning-objectives" class="slide level2">
 <h2>Learning objectives</h2>
 <ul>
-<li>PLACE LOS HERE</li>
+<li>Distinguish between AI, machine learning, and deep learning</li>
+<li>Identify the core components: weights, loss function, optimizer</li>
+<li>Discuss the current state and realistic expectations for AI</li>
 </ul>
 </section>
-<section id="assertion-about-what-this-slide-shows" class="slide level2">
-<h2>ASSERTION ABOUT WHAT THIS SLIDE SHOWS</h2>
-<p>EVIDENCE BACKING UP THE ASSERTION</p>
+<section id="the-nested-circles" class="slide level2">
+<h2>The nested circles</h2>
+
+<img data-src="images/ai-ml-dl.png" class="r-stretch quarto-figure-center"><p class="caption">Nested circles labeled AI, ML, and DL.</p><ul>
+<li><strong>AI</strong>: Effort to automate intellectual tasks (includes non-learning approaches)</li>
+<li><strong>ML</strong>: Learning rules from data instead of programming them</li>
+<li><strong>DL</strong>: Learning successive layers of representations</li>
+</ul>
 <aside class="notes">
 <ul>
-<li>You can add notes on each slide with blocks like this!</li>
-<li>Load a deck in the browser and type “s” to see these notes.</li>
+<li>Symbolic AI dominated 1950s-1980s (expert systems, chess)</li>
+<li>Failed on “fuzzy” problems: images, speech, language</li>
+<li>Key question: Where does each approach make sense today?</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="classical-programming-vs-ml" class="slide level2">
+<h2>Classical programming vs ML</h2>
+
+<img data-src="images/a-new-programming-paradigm.png" class="r-stretch quarto-figure-center"><p class="caption">Classical programming vs ML workflow diagram.</p><ul>
+<li>Classical: Human writes rules → Computer applies rules</li>
+<li>ML: Computer observes data + answers → Computer learns rules</li>
+</ul>
+<aside class="notes">
+<ul>
+<li>“Trained rather than explicitly programmed”</li>
+<li>What kinds of problems are still better suited to classical programming?</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="ml-vs-statistical-inference" class="slide level2">
+<h2>ML vs statistical inference</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Inference</th>
+<th>ML</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Goal</strong></td>
+<td>Estimate parameters + uncertainty</td>
+<td>Predictions/generalization</td>
+</tr>
+<tr class="even">
+<td><strong>Models</strong></td>
+<td>Theory-driven, causal</td>
+<td>Flexible, data-driven</td>
+</tr>
+<tr class="odd">
+<td><strong>Data regime</strong></td>
+<td>Small n, strong assumptions</td>
+<td>Large n, weaker assumptions</td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<ul>
+<li><strong>Goal</strong>: Inference cares about parameter values — “What is β? Is it significantly different from 0? What’s the 95% CI?” ML doesn’t care about parameters (millions of meaningless weights) — only whether predictions are accurate on held-out data.</li>
+<li><strong>Models</strong>: Inference builds models from domain knowledge (e.g., linear model because theory says X causes Y). ML uses flexible models (neural nets, trees) that learn structure from data.</li>
+<li><strong>Sweet spot</strong>: With small n, you need strong assumptions to learn anything. With large n, you can let the data speak.</li>
+<li>Many modern methods blur the line (regularization, Bayesian ML, causal ML)</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-three-ingredients-of-ml" class="slide level2">
+<h2>The three ingredients of ML</h2>
+<ol type="1">
+<li><strong>Input data points</strong> — Images, text, audio, tabular data…</li>
+<li><strong>Example outputs</strong> — Labels, transcriptions, categories…</li>
+<li><strong>A way to measure success</strong> — How far off are we?</li>
+</ol>
+<p>The third ingredient is crucial: the <strong>feedback signal</strong> drives learning.</p>
+<aside class="notes">
+<ul>
+<li>This is where the term “supervised learning” comes from</li>
+<li>What happens when you don’t have labeled data? (self-supervised, unsupervised)</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="representations" class="slide level2">
+<h2>Representations</h2>
+<ul>
+<li>A <strong>representation</strong> is just a different way to look at/encode data that makes a task easier.</li>
+<li>ML works by finding these useful representations automatically</li>
+</ul>
+
+<img data-src="images/learning_representations.png" class="r-stretch quarto-figure-center"><p class="caption">Representation learning transforms data coordinates.</p><ul>
+<li>Separating black vs white becomes a simple rule: <code>x &gt; 0</code></li>
+</ul>
+<aside class="notes">
+<ul>
+<li>ML = searching for useful representations + rules</li>
+<li>“Hypothesis space” = the set of transformations we search through</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-deep-in-deep-learning" class="slide level2">
+<h2>The “deep” in deep learning</h2>
+
+<img data-src="images/mnist_representations.png" class="r-stretch quarto-figure-center"><p class="caption">Deep learning</p><ul>
+<li>Refers to <strong>successive layers</strong> of representations</li>
+<li>Tens to hundreds of layers, all learned automatically</li>
+</ul>
+<blockquote>
+<p>“A multistage information-distillation process”</p>
+</blockquote>
+<aside class="notes">
+<ul>
+<li>The book is explicit: DL is not modeled on the brain; treat it as math</li>
+<li>Shallow learning: 1-2 layers, often needed hand-crafted features</li>
+<li>Neural networks: layers stacked, inspired (loosely!) by biology</li>
+<li>The brain connection is overhyped — it’s really just math</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="how-it-works-three-figures-13" class="slide level2">
+<h2>How it works: Three figures (1/3)</h2>
+<p><strong>Weights parameterize each layer</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/deep-learning-in-3-figures-1.png" height="300"></p>
+<figcaption>Neural network layer with weights and parameters.</figcaption>
+</figure>
+</div>
+<ul>
+<li>Learning = finding good values for millions of parameters</li>
+</ul>
+</section>
+<section id="how-it-works-three-figures-23" class="slide level2">
+<h2>How it works: Three figures (2/3)</h2>
+<p><strong>Loss function measures quality</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/deep-learning-in-3-figures-2.png" height="300"></p>
+<figcaption>Loss function measuring prediction error.</figcaption>
+</figure>
+</div>
+<ul>
+<li>Distance between predictions and targets</li>
+<li>Also called: objective function, cost function</li>
+</ul>
+</section>
+<section id="how-it-works-three-figures-33" class="slide level2">
+<h2>How it works: Three figures (3/3)</h2>
+<p><strong>Optimizer adjusts weights using the loss</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/deep-learning-in-3-figures-3.png" height="300"></p>
+<figcaption>Optimizer updates weights via backpropagation.</figcaption>
+</figure>
+</div>
+<ul>
+<li><strong>Backpropagation</strong>: the central algorithm</li>
+<li>Training loop: repeat to reduce loss</li>
+</ul>
+<aside class="notes">
+<ul>
+<li>Random initialization + repeated updates are what make the loop work</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="what-makes-deep-learning-different" class="slide level2">
+<h2>What makes deep learning different?</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Property</th>
+<th>Why it matters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Simplicity</strong></td>
+<td>Automates feature engineering — no hand-crafting</td>
+</tr>
+<tr class="even">
+<td><strong>Scalability</strong></td>
+<td>GPUs + batching enable much larger datasets</td>
+</tr>
+<tr class="odd">
+<td><strong>Versatility</strong></td>
+<td>Models are reusable, can do online learning</td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<ul>
+<li>Foundation models: train once, use everywhere</li>
+<li>Transfer learning changed the economics of ML</li>
+<li>End-to-end DL replaces multistage pipelines that needed hand-crafted features</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-age-of-generative-ai" class="slide level2">
+<h2>The age of generative AI</h2>
+<ul>
+<li><strong>Self-supervised learning</strong>: targets come from the input itself
+<ul>
+<li>Predict next word, reconstruct noisy images</li>
+</ul></li>
+<li>ChatGPT, Gemini, Claude, Midjourney…</li>
+<li><strong>Foundation models</strong>: huge, trained on massive unlabeled data</li>
+</ul>
+<blockquote>
+<p>These models work as a “fuzzy database of human knowledge”</p>
+</blockquote>
+<aside class="notes">
+<ul>
+<li>Generative AI ideas date back to the 1990s</li>
+<li>The first edition of this book (2017) had a “Generative AI” chapter!</li>
+<li>Foundation models learn by reconstructing inputs (next-word, denoising)</li>
+<li>Scale note: hundreds of billions of params, &gt;1PB data, tens of $M to train</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="what-dl-has-achieved" class="slide level2">
+<h2>What DL has achieved</h2>
+<ul>
+<li>Fluent chatbots &amp; programming assistants (ChatGPT, Gemini, GitHub Copilot)</li>
+<li>Photorealistic image and video generation</li>
+<li>Human-level: image classification, speech/handwriting transcription</li>
+<li>Dramatically improved translation &amp; text-to-speech</li>
+<li>Autonomous driving deployed in Phoenix, San Francisco, Los Angeles, and Austin (as of 2025)</li>
+<li>Superhuman game playing (Go, Chess, Poker)</li>
+</ul>
+<aside class="notes">
+<ul>
+<li>Discussion: Which of these surprised you most?</li>
+<li>Which still has the most room to grow?</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="beware-the-hype" class="slide level2">
+<h2>Beware the hype</h2>
+<p><strong>2023 predictions that didn’t pan out:</strong></p>
+<ul>
+<li>“No one needs to work anymore!”</li>
+<li>10x-100x productivity gains imminent</li>
+<li>Mass unemployment within a year</li>
+</ul>
+<p><strong>Reality (mid-2025):</strong></p>
+<ul>
+<li>“Tens of billions” in generative AI revenue (overall)</li>
+<li>AI investment surpasses $100B annually, revenue closer to $10B</li>
+</ul>
+<aside class="notes">
+<ul>
+<li>AGI predictions: Minsky (1967), OpenAI’s 2016 pitch, now again in 2023</li>
+<li>Pattern: Overpromise → disappointment → “AI winter”?</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="agi-soon" class="slide level2">
+<h2>AGI soon?</h2>
+<ul>
+<li>AI: “Cognitive automation” = handles only what it’s trained for</li>
+<li>Intelligence: “Cognitive autonomy” = facing the unknown, adapting, learning from it</li>
+</ul>
+<blockquote>
+<p>“Think of it this way: AI is like a cartoon character, while intelligence is like a living being. A cartoon, no matter how realistic, can only act out the scenes it was drawn for.”</p>
+</blockquote>
+<aside class="notes">
+<ul>
+<li>This is Chollet’s key argument against AGI hype</li>
+<li>2013–2015: near-term AGI fear helped motivate OpenAI’s founding (2015)</li>
+<li>OpenAI’s 2016 recruiting pitch: AGI by 2020</li>
+<li>Discussion: Do you agree? Can scaling solve this?</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="ai-winters-a-history" class="slide level2">
+<h2>AI Winters: A history</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Era</th>
+<th>Hype</th>
+<th>Crash</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1960s</td>
+<td>Symbolic AI → AGI in “a generation”</td>
+<td>1970s: First AI winter</td>
+</tr>
+<tr class="even">
+<td>1980s</td>
+<td>Expert systems boom</td>
+<td>Early 1990s: Second AI winter</td>
+</tr>
+<tr class="odd">
+<td>2020s</td>
+<td>Generative AI, AGI soon?</td>
+<td>???</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Author’s view: Unlikely to be a <em>full</em> retreat, but some “air” will come out</li>
+</ul>
+<aside class="notes">
+<ul>
+<li>Minsky 1967: AGI within a generation</li>
+<li>Minsky 1970: General intelligence in 3-8 years</li>
+<li>OpenAI 2016: AGI by 2020</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-long-term-promise" class="slide level2">
+<h2>The long-term promise</h2>
+<p>From the previous edition of this book (written in 2017):</p>
+<blockquote>
+<p>“AI will be your assistant… help educate your kids… watch over your health… be your interface to an increasingly complex world.”</p>
+</blockquote>
+<p><strong>2025 reality:</strong></p>
+<ul>
+<li>Well… we know how that turned out so far!</li>
+<li>… but maybe we’re still “internet in 1995”</li>
+</ul>
+</section>
+<section id="discussion-questions" class="slide level2">
+<h2>Discussion questions</h2>
+<ol type="1">
+<li>Is self-supervised learning fundamentally different from supervised?</li>
+<li>What’s one thing DL <em>shouldn’t</em> be applied to?</li>
+<li>Are we in another hype cycle? What’s different this time?</li>
+</ol>
+<aside class="notes">
+<ul>
+<li>These are meant to spark discussion, not have right answers!</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {

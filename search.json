@@ -14,21 +14,133 @@
     "href": "slides/01.html#learning-objectives",
     "title": "What is deep learning?",
     "section": "Learning objectives",
-    "text": "Learning objectives\n\nPLACE LOS HERE"
+    "text": "Learning objectives\n\nDistinguish between AI, machine learning, and deep learning\nIdentify the core components: weights, loss function, optimizer\nDiscuss the current state and realistic expectations for AI"
   },
   {
-    "objectID": "slides/01.html#assertion-about-what-this-slide-shows",
-    "href": "slides/01.html#assertion-about-what-this-slide-shows",
+    "objectID": "slides/01.html#the-nested-circles",
+    "href": "slides/01.html#the-nested-circles",
     "title": "What is deep learning?",
-    "section": "ASSERTION ABOUT WHAT THIS SLIDE SHOWS",
-    "text": "ASSERTION ABOUT WHAT THIS SLIDE SHOWS\nEVIDENCE BACKING UP THE ASSERTION\n\n\nYou can add notes on each slide with blocks like this!\nLoad a deck in the browser and type “s” to see these notes."
+    "section": "The nested circles",
+    "text": "The nested circles\n\nNested circles labeled AI, ML, and DL.\nAI: Effort to automate intellectual tasks (includes non-learning approaches)\nML: Learning rules from data instead of programming them\nDL: Learning successive layers of representations\n\n\n\nSymbolic AI dominated 1950s-1980s (expert systems, chess)\nFailed on “fuzzy” problems: images, speech, language\nKey question: Where does each approach make sense today?"
+  },
+  {
+    "objectID": "slides/01.html#classical-programming-vs-ml",
+    "href": "slides/01.html#classical-programming-vs-ml",
+    "title": "What is deep learning?",
+    "section": "Classical programming vs ML",
+    "text": "Classical programming vs ML\n\nClassical programming vs ML workflow diagram.\nClassical: Human writes rules → Computer applies rules\nML: Computer observes data + answers → Computer learns rules\n\n\n\n“Trained rather than explicitly programmed”\nWhat kinds of problems are still better suited to classical programming?"
+  },
+  {
+    "objectID": "slides/01.html#ml-vs-statistical-inference",
+    "href": "slides/01.html#ml-vs-statistical-inference",
+    "title": "What is deep learning?",
+    "section": "ML vs statistical inference",
+    "text": "ML vs statistical inference\n\n\n\n\n\n\n\n\n\nInference\nML\n\n\n\n\nGoal\nEstimate parameters + uncertainty\nPredictions/generalization\n\n\nModels\nTheory-driven, causal\nFlexible, data-driven\n\n\nData regime\nSmall n, strong assumptions\nLarge n, weaker assumptions\n\n\n\n\n\nGoal: Inference cares about parameter values — “What is β? Is it significantly different from 0? What’s the 95% CI?” ML doesn’t care about parameters (millions of meaningless weights) — only whether predictions are accurate on held-out data.\nModels: Inference builds models from domain knowledge (e.g., linear model because theory says X causes Y). ML uses flexible models (neural nets, trees) that learn structure from data.\nSweet spot: With small n, you need strong assumptions to learn anything. With large n, you can let the data speak.\nMany modern methods blur the line (regularization, Bayesian ML, causal ML)"
+  },
+  {
+    "objectID": "slides/01.html#the-three-ingredients-of-ml",
+    "href": "slides/01.html#the-three-ingredients-of-ml",
+    "title": "What is deep learning?",
+    "section": "The three ingredients of ML",
+    "text": "The three ingredients of ML\n\nInput data points — Images, text, audio, tabular data…\nExample outputs — Labels, transcriptions, categories…\nA way to measure success — How far off are we?\n\nThe third ingredient is crucial: the feedback signal drives learning.\n\n\nThis is where the term “supervised learning” comes from\nWhat happens when you don’t have labeled data? (self-supervised, unsupervised)"
+  },
+  {
+    "objectID": "slides/01.html#representations",
+    "href": "slides/01.html#representations",
+    "title": "What is deep learning?",
+    "section": "Representations",
+    "text": "Representations\n\nA representation is just a different way to look at/encode data that makes a task easier.\nML works by finding these useful representations automatically\n\n\nRepresentation learning transforms data coordinates.\nSeparating black vs white becomes a simple rule: x &gt; 0\n\n\n\nML = searching for useful representations + rules\n“Hypothesis space” = the set of transformations we search through"
+  },
+  {
+    "objectID": "slides/01.html#the-deep-in-deep-learning",
+    "href": "slides/01.html#the-deep-in-deep-learning",
+    "title": "What is deep learning?",
+    "section": "The “deep” in deep learning",
+    "text": "The “deep” in deep learning\n\nDeep learning\nRefers to successive layers of representations\nTens to hundreds of layers, all learned automatically\n\n\n“A multistage information-distillation process”\n\n\n\nThe book is explicit: DL is not modeled on the brain; treat it as math\nShallow learning: 1-2 layers, often needed hand-crafted features\nNeural networks: layers stacked, inspired (loosely!) by biology\nThe brain connection is overhyped — it’s really just math"
+  },
+  {
+    "objectID": "slides/01.html#how-it-works-three-figures-13",
+    "href": "slides/01.html#how-it-works-three-figures-13",
+    "title": "What is deep learning?",
+    "section": "How it works: Three figures (1/3)",
+    "text": "How it works: Three figures (1/3)\nWeights parameterize each layer\n\n\n\nNeural network layer with weights and parameters.\n\n\n\nLearning = finding good values for millions of parameters"
+  },
+  {
+    "objectID": "slides/01.html#how-it-works-three-figures-23",
+    "href": "slides/01.html#how-it-works-three-figures-23",
+    "title": "What is deep learning?",
+    "section": "How it works: Three figures (2/3)",
+    "text": "How it works: Three figures (2/3)\nLoss function measures quality\n\n\n\nLoss function measuring prediction error.\n\n\n\nDistance between predictions and targets\nAlso called: objective function, cost function"
+  },
+  {
+    "objectID": "slides/01.html#how-it-works-three-figures-33",
+    "href": "slides/01.html#how-it-works-three-figures-33",
+    "title": "What is deep learning?",
+    "section": "How it works: Three figures (3/3)",
+    "text": "How it works: Three figures (3/3)\nOptimizer adjusts weights using the loss\n\n\n\nOptimizer updates weights via backpropagation.\n\n\n\nBackpropagation: the central algorithm\nTraining loop: repeat to reduce loss\n\n\n\nRandom initialization + repeated updates are what make the loop work"
+  },
+  {
+    "objectID": "slides/01.html#what-makes-deep-learning-different",
+    "href": "slides/01.html#what-makes-deep-learning-different",
+    "title": "What is deep learning?",
+    "section": "What makes deep learning different?",
+    "text": "What makes deep learning different?\n\n\n\nProperty\nWhy it matters\n\n\n\n\nSimplicity\nAutomates feature engineering — no hand-crafting\n\n\nScalability\nGPUs + batching enable much larger datasets\n\n\nVersatility\nModels are reusable, can do online learning\n\n\n\n\n\nFoundation models: train once, use everywhere\nTransfer learning changed the economics of ML\nEnd-to-end DL replaces multistage pipelines that needed hand-crafted features"
+  },
+  {
+    "objectID": "slides/01.html#the-age-of-generative-ai",
+    "href": "slides/01.html#the-age-of-generative-ai",
+    "title": "What is deep learning?",
+    "section": "The age of generative AI",
+    "text": "The age of generative AI\n\nSelf-supervised learning: targets come from the input itself\n\nPredict next word, reconstruct noisy images\n\nChatGPT, Gemini, Claude, Midjourney…\nFoundation models: huge, trained on massive unlabeled data\n\n\nThese models work as a “fuzzy database of human knowledge”\n\n\n\nGenerative AI ideas date back to the 1990s\nThe first edition of this book (2017) had a “Generative AI” chapter!\nFoundation models learn by reconstructing inputs (next-word, denoising)\nScale note: hundreds of billions of params, &gt;1PB data, tens of $M to train"
+  },
+  {
+    "objectID": "slides/01.html#what-dl-has-achieved",
+    "href": "slides/01.html#what-dl-has-achieved",
+    "title": "What is deep learning?",
+    "section": "What DL has achieved",
+    "text": "What DL has achieved\n\nFluent chatbots & programming assistants (ChatGPT, Gemini, GitHub Copilot)\nPhotorealistic image and video generation\nHuman-level: image classification, speech/handwriting transcription\nDramatically improved translation & text-to-speech\nAutonomous driving deployed in Phoenix, San Francisco, Los Angeles, and Austin (as of 2025)\nSuperhuman game playing (Go, Chess, Poker)\n\n\n\nDiscussion: Which of these surprised you most?\nWhich still has the most room to grow?"
+  },
+  {
+    "objectID": "slides/01.html#beware-the-hype",
+    "href": "slides/01.html#beware-the-hype",
+    "title": "What is deep learning?",
+    "section": "Beware the hype",
+    "text": "Beware the hype\n2023 predictions that didn’t pan out:\n\n“No one needs to work anymore!”\n10x-100x productivity gains imminent\nMass unemployment within a year\n\nReality (mid-2025):\n\n“Tens of billions” in generative AI revenue (overall)\nAI investment surpasses $100B annually, revenue closer to $10B\n\n\n\nAGI predictions: Minsky (1967), OpenAI’s 2016 pitch, now again in 2023\nPattern: Overpromise → disappointment → “AI winter”?"
+  },
+  {
+    "objectID": "slides/01.html#agi-soon",
+    "href": "slides/01.html#agi-soon",
+    "title": "What is deep learning?",
+    "section": "AGI soon?",
+    "text": "AGI soon?\n\nAI: “Cognitive automation” = handles only what it’s trained for\nIntelligence: “Cognitive autonomy” = facing the unknown, adapting, learning from it\n\n\n“Think of it this way: AI is like a cartoon character, while intelligence is like a living being. A cartoon, no matter how realistic, can only act out the scenes it was drawn for.”\n\n\n\nThis is Chollet’s key argument against AGI hype\n2013–2015: near-term AGI fear helped motivate OpenAI’s founding (2015)\nOpenAI’s 2016 recruiting pitch: AGI by 2020\nDiscussion: Do you agree? Can scaling solve this?"
+  },
+  {
+    "objectID": "slides/01.html#ai-winters-a-history",
+    "href": "slides/01.html#ai-winters-a-history",
+    "title": "What is deep learning?",
+    "section": "AI Winters: A history",
+    "text": "AI Winters: A history\n\n\n\nEra\nHype\nCrash\n\n\n\n\n1960s\nSymbolic AI → AGI in “a generation”\n1970s: First AI winter\n\n\n1980s\nExpert systems boom\nEarly 1990s: Second AI winter\n\n\n2020s\nGenerative AI, AGI soon?\n???\n\n\n\n\nAuthor’s view: Unlikely to be a full retreat, but some “air” will come out\n\n\n\nMinsky 1967: AGI within a generation\nMinsky 1970: General intelligence in 3-8 years\nOpenAI 2016: AGI by 2020"
+  },
+  {
+    "objectID": "slides/01.html#the-long-term-promise",
+    "href": "slides/01.html#the-long-term-promise",
+    "title": "What is deep learning?",
+    "section": "The long-term promise",
+    "text": "The long-term promise\nFrom the previous edition of this book (written in 2017):\n\n“AI will be your assistant… help educate your kids… watch over your health… be your interface to an increasingly complex world.”\n\n2025 reality:\n\nWell… we know how that turned out so far!\n… but maybe we’re still “internet in 1995”"
+  },
+  {
+    "objectID": "slides/01.html#discussion-questions",
+    "href": "slides/01.html#discussion-questions",
+    "title": "What is deep learning?",
+    "section": "Discussion questions",
+    "text": "Discussion questions\n\nIs self-supervised learning fundamentally different from supervised?\nWhat’s one thing DL shouldn’t be applied to?\nAre we in another hype cycle? What’s different this time?\n\n\n\nThese are meant to spark discussion, not have right answers!"
   },
   {
     "objectID": "slides/00.html#book-club-meetings",
     "href": "slides/00.html#book-club-meetings",
     "title": "Club meetings",
     "section": "Book club meetings",
-    "text": "Book club meetings\n\nVolunteer leads discussion of a chapter\n\nThis is the best way to learn the material.\n\nPresentations:\n\nReview of material\nQuestions you have\nMaybe live demo",
+    "text": "Book club meetings\n\nVolunteer leads discussion of a chapter\n\nThis is the best way to learn the material.\n\nPresentations:\n\nReview of material\nQuestions you have\nMaybe live demo (Google Colab)",
     "crumbs": [
       "Club meetings"
     ]
