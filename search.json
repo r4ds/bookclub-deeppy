@@ -10,6 +10,16 @@
     ]
   },
   {
+    "objectID": "01.html",
+    "href": "01.html",
+    "title": "1. What is deep learning?",
+    "section": "",
+    "text": "What is deep learning?\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "crumbs": [
+      "1. What is deep learning?"
+    ]
+  },
+  {
     "objectID": "slides/01.html#learning-objectives",
     "href": "slides/01.html#learning-objectives",
     "title": "What is deep learning?",
@@ -186,13 +196,167 @@
     ]
   },
   {
-    "objectID": "01.html",
-    "href": "01.html",
-    "title": "1. What is deep learning?",
+    "objectID": "slides/02.html#learning-objectives",
+    "href": "slides/02.html#learning-objectives",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "Learning objectives",
+    "text": "Learning objectives\n\nExplain what tensors are and their key attributes\nDescribe common tensor operations (element-wise, broadcasting, dot product)\nTrace the gradient descent training loop step by step"
+  },
+  {
+    "objectID": "slides/02.html#a-first-look-mnist",
+    "href": "slides/02.html#a-first-look-mnist",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "A first look: MNIST",
+    "text": "A first look: MNIST\n\nSample MNIST handwritten digits.\n60,000 training images, 10,000 test images\nEach image: 28×28 grayscale pixels\nGoal: Classify digits 0-9\n\n\n\nClassic “hello world” of deep learning\nSimple enough to train on a laptop\nComplex enough to demonstrate real learning"
+  },
+  {
+    "objectID": "slides/02.html#the-mnist-model-in-keras",
+    "href": "slides/02.html#the-mnist-model-in-keras",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "The MNIST model in Keras",
+    "text": "The MNIST model in Keras\nmodel = keras.Sequential([\n    layers.Dense(512, activation=\"relu\"),\n    layers.Dense(10, activation=\"softmax\")\n])\nmodel.compile(optimizer=\"rmsprop\",\n              loss=\"sparse_categorical_crossentropy\",\n              metrics=[\"accuracy\"])\nmodel.fit(train_images, train_labels, epochs=5, batch_size=128)\n\nTwo Dense layers: fully connected neurons\nReLU: max(0, x) — introduces nonlinearity\nSoftmax: outputs probabilities for each class\n\n\n\nWe’ll understand every piece by end of chapter\nDense = every input connected to every output\n512 neurons is arbitrary — a hyperparameter to tune"
+  },
+  {
+    "objectID": "slides/02.html#what-is-a-tensor",
+    "href": "slides/02.html#what-is-a-tensor",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "What is a tensor?",
+    "text": "What is a tensor?\n\n\n\nRank\nName\nExample\n\n\n\n\n0\nScalar\n12.5 — a single number\n\n\n1\nVector\n[1, 2, 3] — a 1D array\n\n\n2\nMatrix\n2D array (rows × columns)\n\n\n3+\nTensor\n3D, 4D, 5D arrays…\n\n\n\nThree key attributes:\n\nRank (ndim): Number of axes\nShape: Size along each axis, e.g. (60000, 28, 28)\nDtype: Data type (float32, int64, etc.)\n\n\n\nIn NumPy: x.ndim, x.shape, x.dtype\n“Tensor” is just the general term for n-dimensional arrays\nMNIST training data: rank-3 tensor, shape (60000, 28, 28)"
+  },
+  {
+    "objectID": "slides/02.html#real-world-data-as-tensors",
+    "href": "slides/02.html#real-world-data-as-tensors",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "Real-world data as tensors",
+    "text": "Real-world data as tensors\n\n\n\n\n\n\n\n\nData type\nShape\nExample\n\n\n\n\nVector data\n(samples, features)\nTabular data, embeddings\n\n\nTimeseries\n(samples, timesteps, features)\nStock prices, sensor data\n\n\nImages\n(samples, height, width, channels)\nPhotos (3 channels = RGB)\n\n\nVideo\n(samples, frames, height, width, channels)\nMovie clips\n\n\n\n\n\nThe first axis is almost always the “samples” or “batch” axis\nChannels-last is default in TensorFlow/Keras\nPyTorch uses channels-first: (samples, channels, height, width)"
+  },
+  {
+    "objectID": "slides/02.html#timeseries-data-tensor",
+    "href": "slides/02.html#timeseries-data-tensor",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "Timeseries data tensor",
+    "text": "Timeseries data tensor\n\n\n\nA timeseries batch as a 3D tensor.\n\n\n\nShape: (samples, timesteps, features)\nExample: 250 days of stock data with 3 features each"
+  },
+  {
+    "objectID": "slides/02.html#image-data-tensor",
+    "href": "slides/02.html#image-data-tensor",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "Image data tensor",
+    "text": "Image data tensor\n\n\n\nAn image batch as a 4D tensor.\n\n\n\nShape: (samples, height, width, channels)\nMNIST: (60000, 28, 28, 1) — grayscale, so 1 channel"
+  },
+  {
+    "objectID": "slides/02.html#tensor-operations-element-wise",
+    "href": "slides/02.html#tensor-operations-element-wise",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "Tensor operations: Element-wise",
+    "text": "Tensor operations: Element-wise\n# Element-wise addition\nz = x + y  # Each element added independently\n\n# ReLU activation\nz = np.maximum(x, 0)  # Applied to each element\n\nOperations applied independently to each element\nSame shape in, same shape out\nExamples: addition, subtraction, multiplication, ReLU\n\n\n\nReLU = Rectified Linear Unit\nThese are “embarrassingly parallel” — perfect for GPUs\nElement-wise is the simplest tensor operation"
+  },
+  {
+    "objectID": "slides/02.html#tensor-operations-broadcasting",
+    "href": "slides/02.html#tensor-operations-broadcasting",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "Tensor operations: Broadcasting",
+    "text": "Tensor operations: Broadcasting\nWhen shapes don’t match, the smaller tensor is broadcast to fit:\nx = np.array([[1, 2], [3, 4]])  # Shape (2, 2)\ny = np.array([10, 20])          # Shape (2,)\nz = x + y                        # y broadcast to (2, 2)\n# Result: [[11, 22], [13, 24]]\nRules:\n\nAxes are compared right-to-left\nDimensions must be equal OR one of them is 1\nMissing axes are treated as 1\n\n\n\nBroadcasting avoids explicit loops and copies\nVery efficient — no new memory allocated\nCommon pitfall: broadcasting can hide shape bugs"
+  },
+  {
+    "objectID": "slides/02.html#tensor-operations-dot-product",
+    "href": "slides/02.html#tensor-operations-dot-product",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "Tensor operations: Dot product",
+    "text": "Tensor operations: Dot product\n\n\n\nMatrix dot product computation.\n\n\n\nThe core operation in neural networks\nRows of first matrix × columns of second\nResult shape: (a, b) @ (b, c) → (a, c)\n\n\n\nAlso called matrix multiplication, matmul, gemm\nThis is what Dense layers do: output = dot(input, W) + b\nGPUs are optimized specifically for this operation"
+  },
+  {
+    "objectID": "slides/02.html#tensor-reshaping",
+    "href": "slides/02.html#tensor-reshaping",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "Tensor reshaping",
+    "text": "Tensor reshaping\nx = np.array([[0, 1], [2, 3], [4, 5]])  # Shape (3, 2)\nx = x.reshape((6,))    # Shape (6,)\nx = x.reshape((2, 3))  # Shape (2, 3)\n\nChanges tensor shape without changing data\nTotal elements must remain the same\nTranspose: special case that swaps axes\n\n\n\nReshaping is just reinterpreting the same memory\nZero-cost operation (no data copying)\nCommon use: flatten images before Dense layers"
+  },
+  {
+    "objectID": "slides/02.html#geometric-interpretation",
+    "href": "slides/02.html#geometric-interpretation",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "Geometric interpretation",
+    "text": "Geometric interpretation\n\n\n\nDense layer as affine transform with ReLU.\n\n\n\nDense layers = affine transformations (rotation + translation)\nReLU = “creasing” that introduces nonlinearity\nStacking layers = composing transformations\n\n\n\nWithout nonlinearity, stacked layers collapse to a single linear transform\nReLU “folds” the space, creating piecewise linear boundaries\nThis is why depth matters: more folds = more complex boundaries"
+  },
+  {
+    "objectID": "slides/02.html#the-paper-ball-analogy",
+    "href": "slides/02.html#the-paper-ball-analogy",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "The paper ball analogy",
+    "text": "The paper ball analogy\n\n\n\nUncrumpling a crumpled paper ball.\n\n\n\n“A deep network is a mathematical machine for uncrumpling complicated manifolds”\n\n\n\nImagine your data classes as tangled, crumpled paper\nThe network learns to “uncrumple” it until classes are separable\nEach layer does part of the uncrumpling"
+  },
+  {
+    "objectID": "slides/02.html#the-training-loop",
+    "href": "slides/02.html#the-training-loop",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "The training loop",
+    "text": "The training loop\n\nDraw a batch of training samples\nForward pass: Compute predictions\nCompute loss: Measure prediction error\nBackward pass: Calculate gradients\nUpdate weights: Move opposite to gradient\n\nRepeat until loss is low enough (or patience runs out).\n\n\n“Epoch” = one pass through entire training set\n“Batch” = subset of samples processed together\nThis loop is the same for almost all neural networks"
+  },
+  {
+    "objectID": "slides/02.html#what-is-a-gradient",
+    "href": "slides/02.html#what-is-a-gradient",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "What is a gradient?",
+    "text": "What is a gradient?\n\nDerivative: How output changes when input changes slightly\nGradient: Vector of partial derivatives (one per input dimension)\nPoints toward steepest increase of the function\n\nFor loss function L with weights W:\n\\[\\nabla_W L = \\left( \\frac{\\partial L}{\\partial w_1}, \\frac{\\partial L}{\\partial w_2}, \\ldots \\right)\\]\n\n\nWe want to decrease loss, so we move opposite to gradient\n“Gradient descent” = repeatedly stepping downhill\nThe gradient tells us both direction AND magnitude of steepest ascent"
+  },
+  {
+    "objectID": "slides/02.html#gradient-descent-visualized",
+    "href": "slides/02.html#gradient-descent-visualized",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "Gradient descent visualized",
+    "text": "Gradient descent visualized\n\n\n\nGradient descent on a 2D loss surface.\n\n\n\nStart at random point\nCompute gradient (slope)\nTake small step opposite to gradient\nRepeat\n\n\n\nLearning rate controls step size\nToo large: overshoot and oscillate\nToo small: slow convergence"
+  },
+  {
+    "objectID": "slides/02.html#stochastic-gradient-descent-sgd",
+    "href": "slides/02.html#stochastic-gradient-descent-sgd",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "Stochastic Gradient Descent (SGD)",
+    "text": "Stochastic Gradient Descent (SGD)\nWhy “stochastic”? We use random mini-batches, not full dataset.\n\n\n\nVariant\nKey idea\n\n\n\n\nSGD\nUpdate = learning_rate × gradient\n\n\nMomentum\nAccumulate velocity to escape local minima\n\n\nRMSprop\nAdapt learning rate per-parameter\n\n\nAdam\nCombines momentum + RMSprop\n\n\n\n\n\nMini-batch SGD is the standard in deep learning\n“Stochastic” = randomness from batch sampling\nAdam is a good default; RMSprop works well too"
+  },
+  {
+    "objectID": "slides/02.html#local-vs-global-minima",
+    "href": "slides/02.html#local-vs-global-minima",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "Local vs global minima",
+    "text": "Local vs global minima\n\n\n\nLocal minimum vs global minimum.\n\n\n\nLocal minimum: Low point in neighborhood\nGlobal minimum: Lowest point overall\nIn practice: local minima aren’t usually a problem in high dimensions\n\n\n\nHigh-dimensional loss surfaces have many saddle points\nMomentum helps escape saddle points\nMost “local minima” in deep learning are nearly as good as global"
+  },
+  {
+    "objectID": "slides/02.html#backpropagation",
+    "href": "slides/02.html#backpropagation",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "Backpropagation",
+    "text": "Backpropagation\n\n\n\nBackward pass through computation graph.\n\n\n\nChain rule applied to computation graphs\nGradients flow backward from loss to parameters\nAutomatic differentiation: frameworks compute this for you\n\n\n\n“Backprop” = efficient algorithm to compute all gradients\nKey insight: reuse intermediate gradients (dynamic programming)\nTensorFlow’s GradientTape, PyTorch’s autograd do this automatically"
+  },
+  {
+    "objectID": "slides/02.html#backprop-the-chain-rule",
+    "href": "slides/02.html#backprop-the-chain-rule",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "Backprop: The chain rule",
+    "text": "Backprop: The chain rule\nFor composed functions: \\(f(g(x))\\)\n\\[\\frac{d}{dx} f(g(x)) = \\frac{df}{dg} \\cdot \\frac{dg}{dx}\\]\n\nNeural networks are long chains of functions\nGradient at any layer = gradient above × local gradient\nComputed efficiently in one backward pass\n\n\n\nThis is calculus 101, but applied at massive scale\nModern frameworks trace operations and build the graph automatically\nThe “backward” pass mirrors the structure of the forward pass"
+  },
+  {
+    "objectID": "slides/02.html#looking-back-at-mnist",
+    "href": "slides/02.html#looking-back-at-mnist",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "Looking back at MNIST",
+    "text": "Looking back at MNIST\nmodel.fit(train_images, train_labels, epochs=5, batch_size=128)\nNow we understand what happens:\n\nBatch of 128 images drawn from training data\nForward: Input → Dense(512, relu) → Dense(10, softmax) → Predictions\nLoss: Compare predictions to labels (cross-entropy)\nBackward: Compute gradients for all ~400K parameters\nUpdate: RMSprop adjusts each weight\nRepeat ~469 times per epoch (60000 ÷ 128)\n\n\n\n5 epochs × 469 batches = ~2,345 weight updates\nEach update uses gradients from 128 samples\nFinal accuracy: ~98% on test set"
+  },
+  {
+    "objectID": "slides/02.html#discussion-questions",
+    "href": "slides/02.html#discussion-questions",
+    "title": "The mathematical building blocks of neural networks",
+    "section": "Discussion questions",
+    "text": "Discussion questions\n\nWhy do we use mini-batches instead of the full dataset?\nWhat happens if the learning rate is too high? Too low?\nWhy are GPUs so effective for neural network training?\n\n\n\nMini-batches: memory limits, faster updates, regularization effect\nLearning rate: too high = diverge, too low = slow/stuck\nGPUs: massive parallelism for matrix operations"
+  },
+  {
+    "objectID": "02.html",
+    "href": "02.html",
+    "title": "2. The mathematical building blocks of neural networks",
     "section": "",
-    "text": "What is deep learning?\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "The mathematical building blocks of neural networks\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "1. What is deep learning?"
+      "2. The mathematical building blocks of neural networks"
     ]
   }
 ]
