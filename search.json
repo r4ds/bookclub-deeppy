@@ -10,14 +10,126 @@
     ]
   },
   {
-    "objectID": "01.html",
-    "href": "01.html",
-    "title": "1. What is deep learning?",
+    "objectID": "02.html",
+    "href": "02.html",
+    "title": "2. The mathematical building blocks of neural networks",
     "section": "",
-    "text": "What is deep learning?\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "The mathematical building blocks of neural networks\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "1. What is deep learning?"
+      "2. The mathematical building blocks of neural networks"
     ]
+  },
+  {
+    "objectID": "slides/05.html#learning-objectives",
+    "href": "slides/05.html#learning-objectives",
+    "title": "Fundamentals of machine learning",
+    "section": "Learning objectives",
+    "text": "Learning objectives\n\nUnderstand the tension between optimization and generalization\nChoose appropriate model evaluation strategies\nLearn some regularization techniques to improve generalization"
+  },
+  {
+    "objectID": "slides/05.html#optimization-vs-generalization",
+    "href": "slides/05.html#optimization-vs-generalization",
+    "title": "Fundamentals of machine learning",
+    "section": "Optimization vs generalization",
+    "text": "Optimization vs generalization\nThe fundamental tension in machine learning:\n\nOptimization: Adjusting the model to perform well on training data\nGeneralization: How well the model performs on data it has never seen\n\n\nThese two goals are at odds — and managing this tension is what ML is all about.\n\n\n\nEarly in training, both improve together (underfitting regime)\nAfter a point, training loss keeps falling but validation loss plateaus or rises\nThat inflection point is where overfitting begins"
+  },
+  {
+    "objectID": "slides/05.html#underfitting-vs-overfitting",
+    "href": "slides/05.html#underfitting-vs-overfitting",
+    "title": "Fundamentals of machine learning",
+    "section": "Underfitting vs overfitting",
+    "text": "Underfitting vs overfitting\n\n\n\nCanonical overfitting behavior.\n\n\n\nBoth curves drop together (underfitting), then diverge (overfitting)\nThe “robust fit” point is where we want to stop\nThis pattern is universal across all model types and datasets\n\n\n\nThe goal is to find and stop at the sweet spot\nWe’ll see tools for this: early stopping, regularization\nThe key diagnostic: compare training vs validation metrics"
+  },
+  {
+    "objectID": "slides/05.html#why-models-overfit",
+    "href": "slides/05.html#why-models-overfit",
+    "title": "Fundamentals of machine learning",
+    "section": "Why models overfit",
+    "text": "Why models overfit\nThree main sources:\n\nNoisy training data — mislabeled samples or invalid inputs cause memorization of outliers\nAmbiguous features — input regions that map to multiple classes; model becomes overconfident\nRare features → spurious correlations — uncommon values create false associations\n\n\n\nMNIST experiment in the book: adding 784 white noise channels degraded validation accuracy by ~1%\nThe noise channels had no information, but the model found accidental patterns\nShuffled-label experiment: model memorized random labels perfectly — zero generalization\nNOTEBOOK DEMO: Open notebooks/chapter05_demo.ipynb, Demo 1. Run the noise channels experiment and show the validation accuracy plot. Ask: “Why can’t the model just ignore the noise?”"
+  },
+  {
+    "objectID": "slides/05.html#the-manifold-hypothesis",
+    "href": "slides/05.html#the-manifold-hypothesis",
+    "title": "Fundamentals of machine learning",
+    "section": "The manifold hypothesis",
+    "text": "The manifold hypothesis\n\nReal-world data lives on low-dimensional manifolds within high-dimensional space\nThese manifolds are smooth and continuous — you can morph one sample into another\n\n\n\n\nManifold interpolation produces valid digits; linear interpolation does not.\n\n\n\nGeneralization via interpolation\n\n\n\nExample: images of faces form a manifold — you can smoothly transition between faces\nNot all points in pixel space are valid faces; valid ones cluster on a subspace\nGradient descent’s smooth, incremental nature helps capture manifold structure\n“Training data is paramount” — you need dense sampling near decision boundaries"
+  },
+  {
+    "objectID": "slides/05.html#evaluating-models-the-three-sets",
+    "href": "slides/05.html#evaluating-models-the-three-sets",
+    "title": "Fundamentals of machine learning",
+    "section": "Evaluating models: The three sets",
+    "text": "Evaluating models: The three sets\n\n\n\n\n\n\n\n\nSet\nPurpose\nWhen used\n\n\n\n\nTraining\nFit model parameters\nEvery epoch\n\n\nValidation\nTune hyperparameters, detect overfitting\nDuring development\n\n\nTest\nFinal unbiased evaluation\nOnce, at the very end\n\n\n\n\nNever tune anything based on test set performance\nInformation “leaks” from validation set into the model via your decisions\n\n\n\nEvery time you use validation performance to make a decision, information leaks\nThe test set must remain truly untouched until final evaluation\nIn Kaggle: validation = your local eval, test = the leaderboard"
+  },
+  {
+    "objectID": "slides/05.html#three-evaluation-protocols",
+    "href": "slides/05.html#three-evaluation-protocols",
+    "title": "Fundamentals of machine learning",
+    "section": "Three evaluation protocols",
+    "text": "Three evaluation protocols\n1. Simple hold-out: Fixed train/val/test split\n\nFast, but unreliable with small datasets\n\n2. K-fold cross-validation: Split data into K parts, rotate validation set\n\nMore reliable; average K results\n\n3. Iterated K-fold with shuffling: Repeat K-fold P times, reshuffle each time\n\nMost reliable; costs P × K model trainings\n\n\n\nK=4 or K=5 is common\nIterated K-fold is gold standard for small datasets\nFor large datasets, simple hold-out is usually fine"
+  },
+  {
+    "objectID": "slides/05.html#evaluation-pitfalls",
+    "href": "slides/05.html#evaluation-pitfalls",
+    "title": "Fundamentals of machine learning",
+    "section": "Evaluation pitfalls",
+    "text": "Evaluation pitfalls\n\nData representativeness: Always shuffle before splitting\nTemporal ordering: For time-series, validate on future data only\nRedundancy: Ensure no overlap between train and validation (e.g., duplicate photos)\nBaseline: Always beat a common-sense baseline before celebrating\n\n\n\nTemporal leaks are a classic mistake: training on future data to predict the past\nRedundancy: if the same patient appears in train and val, you’re testing memorization\nCommon-sense baseline examples: majority-class classifier, last-value predictor"
+  },
+  {
+    "objectID": "slides/05.html#improving-model-fit",
+    "href": "slides/05.html#improving-model-fit",
+    "title": "Fundamentals of machine learning",
+    "section": "Improving model fit",
+    "text": "Improving model fit\nThree problems you’ll encounter:\n1. Training loss doesn’t decrease\n\nLearning rate too high (overshooting) or too low (stalling)\n\n2. Training works but model doesn’t generalize\n\nData may lack predictive information, or architecture is wrong\n\n3. Can’t achieve overfitting\n\nModel is too small — increase layers or layer sizes\n\n\n\nAchieving overfitting first is a key milestone — it proves your pipeline works\nIf you can’t overfit, the problem is capacity, not regularization\nArchitecture choice matters: use convnets for images, recurrent/transformers for sequences"
+  },
+  {
+    "objectID": "slides/05.html#improving-generalization-data",
+    "href": "slides/05.html#improving-generalization-data",
+    "title": "Fundamentals of machine learning",
+    "section": "Improving generalization: Data",
+    "text": "Improving generalization: Data\n\nCollect more data — the single most effective thing you can do\nMinimize labeling errors — garbage in, garbage out\nClean your data — handle missing values, remove duplicates\nFeature selection — drop irrelevant features that add noise\n\n\n\nDense sampling of the input space is what enables interpolation\nMore data is almost always better than a fancier model\nCleaning data is unglamorous but high-impact"
+  },
+  {
+    "objectID": "slides/05.html#feature-engineering",
+    "href": "slides/05.html#feature-engineering",
+    "title": "Fundamentals of machine learning",
+    "section": "Feature engineering",
+    "text": "Feature engineering\nApplying domain knowledge to create better input representations:\n\nReading a clock: raw pixels → polar coordinates of the hands → time\nDeep learning reduces the need, but doesn’t eliminate it\n\nGood features still help because they:\n\nLet you solve problems with less data\nEnable simpler, more elegant models\n\n\n\nBefore deep learning, feature engineering was ~90% of the work\nDeep learning automates much of it, but domain knowledge still helps\nExample: for house prices, “price per square foot” &gt; raw price + raw area"
+  },
+  {
+    "objectID": "slides/05.html#early-stopping",
+    "href": "slides/05.html#early-stopping",
+    "title": "Fundamentals of machine learning",
+    "section": "Early stopping",
+    "text": "Early stopping\nInterrupt training when validation metrics stop improving: (We will learn this in chapter 7)\ncallbacks_list = [\n    keras.callbacks.EarlyStopping(\n        monitor=\"val_loss\",\n        patience=2,\n    ),\n    keras.callbacks.ModelCheckpoint(\n        filepath=\"best_model.keras\",\n        monitor=\"val_loss\",\n        save_best_only=True,\n    )\n]\n\npatience: how many epochs to wait before stopping\nModelCheckpoint: saves the best model automatically\n\n\n\nThis is the simplest and most effective regularization technique\nAlways use both callbacks together — early stopping + checkpoint\nThe “best” model is from the epoch with lowest validation loss, not the last epoch"
+  },
+  {
+    "objectID": "slides/05.html#regularization-reducing-model-size",
+    "href": "slides/05.html#regularization-reducing-model-size",
+    "title": "Fundamentals of machine learning",
+    "section": "Regularization: Reducing model size",
+    "text": "Regularization: Reducing model size\n\nFewer parameters = fewer things to memorize\nForces the model to learn compressed, generalizable representations\n\n\n\n\nModel\nBehavior\n\n\n\n\nToo small\nUnderfits — can’t capture the patterns\n\n\nToo large\nOverfits — memorizes training data\n\n\nJust right\nGeneralizes well\n\n\n\n\nStart small, increase capacity until overfitting, then regularize\n\n\n\nThere’s no formula for the right size — it’s empirical\nThe book’s heuristic: start with a model that overfits, then shrink/regularize\n“Occam’s razor” — simplest model that fits the data\nNOTEBOOK DEMO: Open notebooks/chapter05_demo.ipynb, Demo 2. Run the IMDB baseline (16-unit) and larger (512-unit) models. Plot both to show how the bigger model overfits much worse. (Pre-run these if short on time.)"
+  },
+  {
+    "objectID": "slides/05.html#regularization-weight-regularization",
+    "href": "slides/05.html#regularization-weight-regularization",
+    "title": "Fundamentals of machine learning",
+    "section": "Regularization: Weight regularization",
+    "text": "Regularization: Weight regularization\nAdd a penalty to the loss for large weight values:\n\nL1: Penalty ∝ |w| — drives weights to exactly zero (sparse)\nL2 (weight decay): Penalty ∝ w² — drives weights toward zero (small)\n\nlayers.Dense(16, activation=\"relu\",\n             kernel_regularizer=regularizers.l2(0.002))\n\n0.002 means: add 0.002 * weight_value² to the total loss per weight\n\n\n\nL2 is more common in practice — also called “weight decay”\nL1 produces sparse models (some weights become exactly 0) — useful for feature selection\nThe penalty coefficient is a hyperparameter to tune\nParticularly effective for smaller models"
+  },
+  {
+    "objectID": "slides/05.html#regularization-dropout",
+    "href": "slides/05.html#regularization-dropout",
+    "title": "Fundamentals of machine learning",
+    "section": "Regularization: Dropout",
+    "text": "Regularization: Dropout\nRandomly zero out a fraction of layer outputs during training:\nmodel = keras.Sequential([\n    layers.Dense(16, activation=\"relu\"),\n    layers.Dropout(0.5),\n    layers.Dense(16, activation=\"relu\"),\n    layers.Dropout(0.5),\n    layers.Dense(1, activation=\"sigmoid\")\n])\n\nTypical rates: 0.2 to 0.5\nAt test time: no dropout, outputs scaled by (1 − rate)\nPrevents “conspiracies” — accidental patterns that don’t generalize\n\n\n\nIntuition: forces each neuron to be useful on its own, not rely on specific partners\nLike training an ensemble of sub-networks that share weights\nDropout is one of the most effective and widely used techniques\nOnly applied during training — model.evaluate() and model.predict() don’t use it\nNOTEBOOK DEMO: Continue in notebooks/chapter05_demo.ipynb, Demo 3. Applies dropout (0.8!) to the large 512-unit model from Demo 2. Plots all three: large without dropout, large with dropout, and original baseline. Shows that enough dropout tames even a massively oversized model to match the small baseline — a striking demonstration of how powerful dropout is."
+  },
+  {
+    "objectID": "slides/05.html#discussion-questions",
+    "href": "slides/05.html#discussion-questions",
+    "title": "Fundamentals of machine learning",
+    "section": "Discussion questions",
+    "text": "Discussion questions\n\nWhy does adding random noise features hurt generalization even though the model could just ignore them?\nWhen would you choose K-fold over simple hold-out validation?\nShould you always prefer a smaller model, or are there cases where bigger is better?\n\n\n\nNoise features: the model finds spurious correlations — it can’t tell signal from noise\nK-fold: small datasets, high-stakes decisions, when variance in results matters\nBigger models + strong regularization can outperform smaller ones (modern trend)"
   },
   {
     "objectID": "slides/01.html#learning-objectives",
@@ -350,13 +462,23 @@
     "text": "Discussion questions\n\nWhy do we use mini-batches instead of the full dataset?\nWhat happens if the learning rate is too high? Too low?\nWhy are GPUs so effective for neural network training?\n\n\n\nMini-batches: memory limits, faster updates, regularization effect\nLearning rate: too high = diverge, too low = slow/stuck\nGPUs: massive parallelism for matrix operations"
   },
   {
-    "objectID": "02.html",
-    "href": "02.html",
-    "title": "2. The mathematical building blocks of neural networks",
+    "objectID": "01.html",
+    "href": "01.html",
+    "title": "1. What is deep learning?",
     "section": "",
-    "text": "The mathematical building blocks of neural networks\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "What is deep learning?\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "2. The mathematical building blocks of neural networks"
+      "1. What is deep learning?"
+    ]
+  },
+  {
+    "objectID": "05.html",
+    "href": "05.html",
+    "title": "5. Fundamentals of machine learning",
+    "section": "",
+    "text": "Fundamentals of machine learning\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "crumbs": [
+      "5. Fundamentals of machine learning"
     ]
   }
 ]

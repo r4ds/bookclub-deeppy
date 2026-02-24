@@ -2,26 +2,34 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://r4ds.github.io/bookclub-deeppy/index.html</loc>
-    <lastmod>2026-02-06T11:28:17.127Z</lastmod>
-  </url>
-  <url>
-    <loc>https://r4ds.github.io/bookclub-deeppy/01.html</loc>
-    <lastmod>2026-02-06T11:29:43.467Z</lastmod>
-  </url>
-  <url>
-    <loc>https://r4ds.github.io/bookclub-deeppy/slides/01.html</loc>
-    <lastmod>2026-02-06T11:28:17.127Z</lastmod>
-  </url>
-  <url>
-    <loc>https://r4ds.github.io/bookclub-deeppy/slides/00.html</loc>
-    <lastmod>2026-02-06T11:28:17.127Z</lastmod>
-  </url>
-  <url>
-    <loc>https://r4ds.github.io/bookclub-deeppy/slides/02.html</loc>
-    <lastmod>2026-02-06T11:28:17.127Z</lastmod>
+    <lastmod>2026-02-24T21:04:02.270Z</lastmod>
   </url>
   <url>
     <loc>https://r4ds.github.io/bookclub-deeppy/02.html</loc>
-    <lastmod>2026-02-06T11:29:43.467Z</lastmod>
+    <lastmod>2026-02-24T21:05:54.614Z</lastmod>
+  </url>
+  <url>
+    <loc>https://r4ds.github.io/bookclub-deeppy/slides/05.html</loc>
+    <lastmod>2026-02-24T21:04:02.272Z</lastmod>
+  </url>
+  <url>
+    <loc>https://r4ds.github.io/bookclub-deeppy/slides/01.html</loc>
+    <lastmod>2026-02-24T21:04:02.272Z</lastmod>
+  </url>
+  <url>
+    <loc>https://r4ds.github.io/bookclub-deeppy/slides/00.html</loc>
+    <lastmod>2026-02-24T21:04:02.272Z</lastmod>
+  </url>
+  <url>
+    <loc>https://r4ds.github.io/bookclub-deeppy/slides/02.html</loc>
+    <lastmod>2026-02-24T21:04:02.272Z</lastmod>
+  </url>
+  <url>
+    <loc>https://r4ds.github.io/bookclub-deeppy/01.html</loc>
+    <lastmod>2026-02-24T21:05:54.614Z</lastmod>
+  </url>
+  <url>
+    <loc>https://r4ds.github.io/bookclub-deeppy/05.html</loc>
+    <lastmod>2026-02-24T21:05:54.615Z</lastmod>
   </url>
 </urlset>
