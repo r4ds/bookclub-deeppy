@@ -35,3 +35,4 @@ website:
       target: deeppy_club-slides
     - 01.qmd
     - 02.qmd
+    - 05.qmd
