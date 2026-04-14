@@ -25,7 +25,10 @@ title: Image classification
 - **Conv** layers learn **local** patterns in small spatial windows, reused everywhere on the grid
 - Two consequences the book stresses: **translation invariance** (same motif anywhere on the image) and a **spatial hierarchy** (edges → textures → parts → objects)
 
+![Spatial hierarchy of patterns from the book’s Figure 8.2.](images/ch08-fig08-02-spatial-hierarchy.png){fig-align="center" height="280" fig-alt="Diagram: low-level lines and textures combine into parts such as eyes, then into a high-level cat concept."}
+
 ::: notes
+- Point at Figure 8.2 (*Deep Learning with Python*, 3e): where does “hierarchy” end and task-specific semantics begin?
 - MNIST example in the book: a simple ConvNet beats the chapter 2 dense baseline — why is that a fair comparison of *inductive bias*, not just "more parameters"?
 - When might a dense or MLP-style model still be reasonable for images? (tiny images, tabularized patches, etc.)
 :::
@@ -37,7 +40,10 @@ title: Image classification
 - **Padding** (`valid` vs `same`): control border shrinkage vs keeping spatial size
 - **Stride** > 1: skip positions and downsample (common in other architectures; classification stacks often prefer pooling instead)
 
+![How patches map into the output feature map (Figure 8.4).](images/ch08-fig08-04-how-convolution-works.png){fig-align="center" height="300" fig-alt="Illustration of a 3D input patch multiplied by a kernel and assembled into a 2D output feature map."}
+
 ::: notes
+- Walk through one location in Figure 8.4 (*Deep Learning with Python*, 3e): input patch → output cell.
 - Invite someone to whiteboard "same padding" vs "valid" for a 3×3 kernel on a small grid — keep it qualitative.
 - Why does sharing one kernel across positions reduce sample complexity compared to learning independent weights per location?
 :::
@@ -70,24 +76,29 @@ title: Image classification
 - Acts as a strong **regularizer**: the network is pushed not to rely on exact pixel placements or lighting
 - Must stay **plausible** for the domain — extreme augmentation can introduce off-manifold examples
 
+![Random augmentations of the same training image (Figure 8.10).](images/ch08-fig08-10-augmentation.png){fig-align="center" height="340" fig-alt="Grid of many versions of one dog photo with flips, crops, and color jitter applied."}
+
 ::: notes
+- Figure 8.10 (*Deep Learning with Python*, 3e): which transforms are “obviously safe” for your application domain, which are risky?
 - How does augmentation interact with **domain shift** (train photos vs deployment camera)?
 - Anyone hit cases where augmentation hurt (text, medical imaging orientation, etc.)?
 :::
 
-## Pretrained models: two moves
+## Pretrained models: featue extraction
 
-**Feature extraction**
+![Reusing a convolutional base with a new classifier head (Figure 8.12).](images/ch08-fig08-12-swapping-classifier.png){fig-align="center" height="260" fig-alt="Block diagram: frozen convolutional base feeds into a new dense classifier stack."}
 
+ 
 - Freeze a trained backbone; train only a small head on your labels
 - Fast, low data, good when your task is "close enough" to the pretraining distribution
 
-**Fine-tuning**
-
+## Pretrained models: Fine-tuning
+- Note this is almost always combined with feature extraction to first train the new laers.
 - Unfreeze some top layers (sometimes with a lower learning rate) so representations adapt to your domain
 - More data and care needed; risk of overfitting or catastrophic forgetting if done too aggressively
 
 ::: notes
+- Relate Figure 8.12 to the bullets: frozen blocks vs which layers you unfreeze for fine-tuning.
 - When would you *not* start from a pretrained vision model in 2026?
 - Compare to chapter 5's themes: early stopping, small heads, and augmentation are all ways to manage capacity vs data.
 :::
