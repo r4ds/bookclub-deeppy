@@ -24,6 +24,41 @@ $highlight-font-color: #A0E9FF;
   color: $highlight-font-color;
 }
 
+.reveal .slides section.compact-slide {
+  font-size: 0.85em;
+}
+
+.reveal .slides section.compact-slide ul {
+  margin-bottom: 0.35em;
+}
+
+.reveal .slides section.compact-slide p {
+  margin-top: 0.25em;
+}
+
+.reveal .slides section.simple-convnet-table table {
+  width: 100%;
+  font-size: 0.54em;
+  line-height: 1.1;
+  border-collapse: collapse;
+}
+
+.reveal .slides section.simple-convnet-table th,
+.reveal .slides section.simple-convnet-table td {
+  padding: 0.18em 0.30em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.reveal .slides section.simple-convnet-table thead th {
+  color: $highlight-font-color;
+  font-weight: 700;
+  border-bottom: 2px solid rgba(160, 233, 255, 0.5);
+}
+
+.reveal .slides section.simple-convnet-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.04);
+}
+
 /*-- Hide
 .reveal .footer {
   font-size: 30px !important;
