@@ -1,0 +1,114 @@
+---
+title: Image classification
+---
+
+## Learning objectives
+
+-   Understand how convolutional networks match the structure of image data
+-   Learn how data augmentation helps mitigate overfitting.
+-   Learn to use pretrained models for small data problem (the usual case!)
+ 
+
+## Why this chapter matters
+
+- Computer vision was an early showcase for deep learning (competitions through the 2010s helped establish CNNs)
+- Convolutional neural networks (ConvNets / CNNs) remain the default backbone for many vision pipelines 
+- CNN's are a good first example of how to design architectures with inductive biases that match the data structure
+- Most practitioners face **small or medium** labeled sets, not web-scale data — the chapter centers that reality
+
+::: notes
+- Ask the group where they already use vision models (phones, search, medical imaging, etc.).
+:::
+
+## Dense layers vs convolutions on images {.compact-slide}
+
+- **Dense** layers learn **global** relationships over the whole flattened input
+- **Conv** layers learn **local** patterns in small spatial windows, reused everywhere on the grid
+- Two consequences the book stresses: **translation invariance** (same motif anywhere on the image) and a **spatial hierarchy** (edges → textures → parts → objects)
+
+![Spatial hierarchy of patterns from the book’s Figure 8.2.](images/ch08-fig08-02-spatial-hierarchy.png){fig-align="center" height="240" fig-alt="Diagram: low-level lines and textures combine into parts such as eyes, then into a high-level cat concept."}
+
+
+## Convolution in one pass
+
+- A **kernel** slides over the height–width grid; each location produces one vector of **filter responses** by dotting the kernel with the local patch of pixels
+- Output **depth** = number of filters; each channel is a **feature map** (where that filter fires)
+- **Padding** (`valid` vs `same`): control border shrinkage vs keeping spatial size
+- **Stride** > 1: skip positions and downsample (common in other architectures; classification stacks often prefer pooling instead)
+- Excellent you-tube video: [Statquest](https://www.youtube.com/watch?v=HGwBXDKFk9I&t=78s)
+
+## Max pooling
+
+- Fixed **max** over small windows (often 2×2, stride 2) — halves spatial size per axis, no learned weights inside the pool
+- **Downsamples** aggressively so deeper layers see broader context without exploding parameters
+- The book contrasts removing pooling: spatial maps stay large and the parameter burden grows
+
+
+## Simple Convnet {.simple-convnet-table}
+
+| Layer (type) | Output shape | Param # |
+|:--|:--|--:|
+| input_layer_2 (InputLayer) | (None, 180, 180, 3) | 0 |
+| rescaling (Rescaling) | (None, 180, 180, 3) | 0 |
+| conv2d_6 (Conv2D) | (None, 178, 178, 32) | 896 |
+| max_pooling2d_2 (MaxPooling2D) | (None, 89, 89, 32) | 0 |
+| conv2d_7 (Conv2D) | (None, 87, 87, 64) | 18,496 |
+| max_pooling2d_3 (MaxPooling2D) | (None, 43, 43, 64) | 0 |
+| conv2d_8 (Conv2D) | (None, 41, 41, 128) | 73,856 |
+| max_pooling2d_4 (MaxPooling2D) | (None, 20, 20, 128) | 0 |
+| conv2d_9 (Conv2D) | (None, 18, 18, 256) | 295,168 |
+| max_pooling2d_5 (MaxPooling2D) | (None, 9, 9, 256) | 0 |
+| conv2d_10 (Conv2D) | (None, 7, 7, 512) | 1,180,160 |
+| global_average_pooling2d_2 (GlobalAveragePooling2D) | (None, 512) | 0 |
+| dense_2 (Dense) | (None, 1) | 513 |
+
+## Understanding Conv2D parameter count
+
+-  `filters * (kernel_size^2 * input_channels + 1)` (the +1 is for the bias term)
+
+- For example, the first Conv2D layer has 32 filters, a kernel size of 3x3, and 3 input channels (RGB):
+
+ `32 * (3^2 * 3 + 1)` = `32 * (27 + 1)` = `32 * 28` = `896` 
+
+## Cats and Dogs: train from scratch
+
+- Deep learning can still help with **limited** labels if you regularize well and use sensible preprocessing
+- **Preprocessing** (resize, scale, optional RGB vs grayscale) aligns inputs with how the network was designed to see the world
+- Expect modest accuracy from scratch on tiny sets — the chapter uses it to set up stronger tools next
+- About 78% test accuracy  
+
+
+## Data augmentation
+
+- Random transforms at **training** time (flips, rotations, zooms, color jitter, etc.) artificially expand diversity
+- Acts as a strong **regularizer**: the network is pushed not to rely on exact pixel placements or lighting
+- Must stay **plausible** for the domain — extreme augmentation can introduce off-manifold examples
+- about 84% test accuracy with augmentation 
+
+ 
+
+## Pretrained models: feature extraction
+
+![Reusing a convolutional base with a new classifier head (Figure 8.12).](images/ch08-fig08-12-swapping-classifier.png){fig-align="center" height="260" fig-alt="Block diagram: frozen convolutional base feeds into a new dense classifier stack."}
+
+ 
+- Freeze a trained backbone; train only a small head on your labels
+- Fast, low data, good when your task is "close enough" to the pretraining distribution
+- Without augmentation 98% test accuracy; with augmentation about the same. (why?)
+
+## Pretrained models: Fine-tuning
+- Almost always combined with feature extraction to first train the new layers.
+- Unfreeze model weights and train with a smaller learning rate to adapt the pretrained features to your task.
+- More data and care needed; risk of overfitting or catastrophic forgetting if done too aggressively
+- Test accuracy about 98.6%
+
+::: notes
+These techniques are great for small data, which is the case most of use will have to deal with! Discuss.
+:::
+
+## Discussion questions
+
+1. Did you try the code in the chapter? What was your experience with training from scratch, augmentation, and pretrained models?
+2. What are some examples of vision problems you might want to solve with small data?  
+3. For a fixed labeling budget, would you spend effort on **more data**, **better augmentation**, or **a larger pretrained backbone** — and in what order?
+
