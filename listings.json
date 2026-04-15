@@ -1,8 +1,8 @@
 [
   {
-    "listing": "/02.html",
+    "listing": "/05.html",
     "items": [
-      "/slides/02.html"
+      "/slides/05.html"
     ]
   },
   {
@@ -12,9 +12,15 @@
     ]
   },
   {
-    "listing": "/05.html",
+    "listing": "/02.html",
     "items": [
-      "/slides/05.html"
+      "/slides/02.html"
+    ]
+  },
+  {
+    "listing": "/08.html",
+    "items": [
+      "/slides/08.html"
     ]
   }
 ]

@@ -9,7 +9,7 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-d0ae9245876894da5ac7e18953ecc5cc.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.9.37">
 
-  <title>Deep Learning with Python (3e) Book Club – Club meetings</title>
+  <title>Deep Learning with Python (3e) Book Club – Image classification</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -129,25 +129,31 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Club meetings</h1>
+  <h1 class="title">Image classification</h1>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section>
-<section id="welcome" class="title-slide slide level1 center">
-<h1>Welcome</h1>
+<section id="learning-objectives" class="slide level2">
+<h2>Learning objectives</h2>
 <ul>
-<li>Welcome to the Deep Learning with Python (3e) book club!</li>
-<li>book: <a href="https://deeplearningwithpython.io">deeplearningwithpython.io</a></li>
-<li>These slides are available at <a href="https://dslc.io/deeppy">dslc.io/deeppy</a>.</li>
-<li>We follow the <a href="https://dslc.io/code_of_conduct.html">Data Science Learning Community Code of Conduct</a>.</li>
+<li>Understand how convolutional networks match the structure of image data</li>
+<li>Learn how data augmentation helps mitigate overfitting.</li>
+<li>Learn to use pretrained models for small data problem (the usual case!)</li>
+</ul>
+</section>
+<section id="why-this-chapter-matters" class="slide level2">
+<h2>Why this chapter matters</h2>
+<ul>
+<li>Computer vision was an early showcase for deep learning (competitions through the 2010s helped establish CNNs)</li>
+<li>Convolutional neural networks (ConvNets / CNNs) remain the default backbone for many vision pipelines</li>
+<li>CNN’s are a good first example of how to design architectures with inductive biases that match the data structure</li>
+<li>Most practitioners face <strong>small or medium</strong> labeled sets, not web-scale data — the chapter centers that reality</li>
 </ul>
 <aside class="notes">
 <ul>
-<li>You can add notes on each slide with blocks like this!</li>
-<li>Load a deck in the browser and type “s” to see these notes.</li>
+<li>Ask the group where they already use vision models (phones, search, medical imaging, etc.).</li>
 </ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -161,67 +167,195 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="book-club-meetings" class="slide level2">
-<h2>Book club meetings</h2>
+<section id="dense-layers-vs-convolutions-on-images" class="slide level2 compact-slide">
+<h2>Dense layers vs convolutions on images</h2>
 <ul>
-<li>Volunteer leads discussion of a chapter
+<li><strong>Dense</strong> layers learn <strong>global</strong> relationships over the whole flattened input</li>
+<li><strong>Conv</strong> layers learn <strong>local</strong> patterns in small spatial windows, reused everywhere on the grid</li>
+<li>Two consequences the book stresses: <strong>translation invariance</strong> (same motif anywhere on the image) and a <strong>spatial hierarchy</strong> (edges → textures → parts → objects)</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/ch08-fig08-02-spatial-hierarchy.png" alt="Diagram: low-level lines and textures combine into parts such as eyes, then into a high-level cat concept." height="240"></p>
+<figcaption>Spatial hierarchy of patterns from the book’s Figure 8.2.</figcaption>
+</figure>
+</div>
+</section>
+<section id="convolution-in-one-pass" class="slide level2">
+<h2>Convolution in one pass</h2>
 <ul>
-<li><strong>This is the best way to learn the material.</strong></li>
-</ul></li>
-<li>Presentations:
-<ul>
-<li>Review of material</li>
-<li>Questions you have</li>
-<li>Maybe live demo (Google Colab)</li>
-</ul></li>
+<li>A <strong>kernel</strong> slides over the height–width grid; each location produces one vector of <strong>filter responses</strong> by dotting the kernel with the local patch of pixels</li>
+<li>Output <strong>depth</strong> = number of filters; each channel is a <strong>feature map</strong> (where that filter fires)</li>
+<li><strong>Padding</strong> (<code>valid</code> vs <code>same</code>): control border shrinkage vs keeping spatial size</li>
+<li><strong>Stride</strong> &gt; 1: skip positions and downsample (common in other architectures; classification stacks often prefer pooling instead)</li>
+<li>Excellent you-tube video: <a href="https://www.youtube.com/watch?v=HGwBXDKFk9I&amp;t=78s">Statquest</a></li>
 </ul>
 </section>
-<section id="how-to-edit-the-slides" class="slide level2">
-<h2>How to edit the slides:</h2>
+<section id="max-pooling" class="slide level2">
+<h2>Max pooling</h2>
 <ul>
-<li>More info about editing: <a href="https://github.com/r4ds/bookclub-deeppy">this github repo</a></li>
-<li>Recorded, available on the <a href="http://dslc.video">Data Science Learning Community YouTube Channel (DSLC.video)</a></li>
+<li>Fixed <strong>max</strong> over small windows (often 2×2, stride 2) — halves spatial size per axis, no learned weights inside the pool</li>
+<li><strong>Downsamples</strong> aggressively so deeper layers see broader context without exploding parameters</li>
+<li>The book contrasts removing pooling: spatial maps stay large and the parameter burden grows</li>
 </ul>
 </section>
-<section id="pace" class="slide level2">
-<h2>Pace</h2>
+<section id="simple-convnet" class="slide level2 simple-convnet-table">
+<h2>Simple Convnet</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Layer (type)</th>
+<th style="text-align: left;">Output shape</th>
+<th style="text-align: right;">Param #</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">input_layer_2 (InputLayer)</td>
+<td style="text-align: left;">(None, 180, 180, 3)</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">rescaling (Rescaling)</td>
+<td style="text-align: left;">(None, 180, 180, 3)</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">conv2d_6 (Conv2D)</td>
+<td style="text-align: left;">(None, 178, 178, 32)</td>
+<td style="text-align: right;">896</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">max_pooling2d_2 (MaxPooling2D)</td>
+<td style="text-align: left;">(None, 89, 89, 32)</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">conv2d_7 (Conv2D)</td>
+<td style="text-align: left;">(None, 87, 87, 64)</td>
+<td style="text-align: right;">18,496</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">max_pooling2d_3 (MaxPooling2D)</td>
+<td style="text-align: left;">(None, 43, 43, 64)</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">conv2d_8 (Conv2D)</td>
+<td style="text-align: left;">(None, 41, 41, 128)</td>
+<td style="text-align: right;">73,856</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">max_pooling2d_4 (MaxPooling2D)</td>
+<td style="text-align: left;">(None, 20, 20, 128)</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">conv2d_9 (Conv2D)</td>
+<td style="text-align: left;">(None, 18, 18, 256)</td>
+<td style="text-align: right;">295,168</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">max_pooling2d_5 (MaxPooling2D)</td>
+<td style="text-align: left;">(None, 9, 9, 256)</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">conv2d_10 (Conv2D)</td>
+<td style="text-align: left;">(None, 7, 7, 512)</td>
+<td style="text-align: right;">1,180,160</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">global_average_pooling2d_2 (GlobalAveragePooling2D)</td>
+<td style="text-align: left;">(None, 512)</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">dense_2 (Dense)</td>
+<td style="text-align: left;">(None, 1)</td>
+<td style="text-align: right;">513</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="understanding-conv2d-parameter-count" class="slide level2">
+<h2>Understanding Conv2D parameter count</h2>
 <ul>
-<li><strong>Goal:</strong> 1 chapter/week</li>
-<li>Ok to split overwhelming chapters</li>
-<li>Ok to combine short chapters</li>
-<li>Meet <strong><em>every</em></strong> week except holidays, etc
+<li><p><code>filters * (kernel_size^2 * input_channels + 1)</code> (the +1 is for the bias term)</p></li>
+<li><p>For example, the first Conv2D layer has 32 filters, a kernel size of 3x3, and 3 input channels (RGB):</p></li>
+</ul>
+<p><code>32 * (3^2 * 3 + 1)</code> = <code>32 * (27 + 1)</code> = <code>32 * 28</code> = <code>896</code></p>
+</section>
+<section id="cats-and-dogs-train-from-scratch" class="slide level2">
+<h2>Cats and Dogs: train from scratch</h2>
 <ul>
-<li>We will meet even if scheduled presenter unavailable</li>
-</ul></li>
-<li>Slack is good place for offline discussion/troubleshooting</li>
+<li>Deep learning can still help with <strong>limited</strong> labels if you regularize well and use sensible preprocessing</li>
+<li><strong>Preprocessing</strong> (resize, scale, optional RGB vs grayscale) aligns inputs with how the network was designed to see the world</li>
+<li>Expect modest accuracy from scratch on tiny sets — the chapter uses it to set up stronger tools next</li>
+<li>About 78% test accuracy</li>
 </ul>
 </section>
-<section id="learning-objectives-los" class="slide level2">
-<h2>Learning objectives (LOs)</h2>
+<section id="data-augmentation" class="slide level2">
+<h2>Data augmentation</h2>
 <ul>
-<li>Students who study with LOs in mind <strong><em>retain more</em></strong></li>
-<li><strong>Tips:</strong>
-<ul>
-<li>Think “After today’s session, you will be able to {LO}”</li>
-<li><em>Very</em> roughly <strong>1 per heading</strong></li>
-</ul></li>
+<li>Random transforms at <strong>training</strong> time (flips, rotations, zooms, color jitter, etc.) artificially expand diversity</li>
+<li>Acts as a strong <strong>regularizer</strong>: the network is pushed not to rely on exact pixel placements or lighting</li>
+<li>Must stay <strong>plausible</strong> for the domain — extreme augmentation can introduce off-manifold examples</li>
+<li>about 84% test accuracy with augmentation</li>
 </ul>
 </section>
-<section id="group-introductions" class="slide level2">
-<h2>Group introductions</h2>
+<section id="pretrained-models-feature-extraction" class="slide level2">
+<h2>Pretrained models: feature extraction</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/ch08-fig08-12-swapping-classifier.png" alt="Block diagram: frozen convolutional base feeds into a new dense classifier stack." height="260"></p>
+<figcaption>Reusing a convolutional base with a new classifier head (Figure 8.12).</figcaption>
+</figure>
+</div>
 <ul>
-<li>If you feel comfortable sharing:
-<ul>
-<li>Who are you?</li>
-<li>Where you calling in from? (If you’re not comfortable sharing, skip)</li>
-<li>How long have you been using Python?</li>
-<li>What was your introduction to Python?</li>
-<li>What are you most looking forward to during the club?</li>
-</ul></li>
+<li>Freeze a trained backbone; train only a small head on your labels</li>
+<li>Fast, low data, good when your task is “close enough” to the pretraining distribution</li>
+<li>Without augmentation 98% test accuracy; with augmentation about the same. (why?)</li>
 </ul>
+</section>
+<section id="pretrained-models-fine-tuning" class="slide level2">
+<h2>Pretrained models: Fine-tuning</h2>
+<ul>
+<li>Almost always combined with feature extraction to first train the new layers.</li>
+<li>Unfreeze model weights and train with a smaller learning rate to adapt the pretrained features to your task.</li>
+<li>More data and care needed; risk of overfitting or catastrophic forgetting if done too aggressively</li>
+<li>Test accuracy about 98.6%</li>
+</ul>
+<aside class="notes">
+<p>These techniques are great for small data, which is the case most of use will have to deal with! Discuss.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="discussion-questions" class="slide level2">
+<h2>Discussion questions</h2>
+<ol type="1">
+<li>Did you try the code in the chapter? What was your experience with training from scratch, augmentation, and pretrained models?</li>
+<li>What are some examples of vision problems you might want to solve with small data?<br>
+</li>
+<li>For a fixed labeling budget, would you spend effort on <strong>more data</strong>, <strong>better augmentation</strong>, or <strong>a larger pretrained backbone</strong> — and in what order?</li>
+</ol>
 
 
-</section></section>
+</section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <div class="footer footer-default">
@@ -437,44 +571,6 @@
         ]
       });
     </script>
-    
-    <script>
-      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
-      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
-      // slide changes (different for each slide format).
-      (function () {
-        // dispatch for htmlwidgets
-        function fireSlideEnter() {
-          const event = window.document.createEvent("Event");
-          event.initEvent("slideenter", true, true);
-          window.document.dispatchEvent(event);
-        }
-
-        function fireSlideChanged(previousSlide, currentSlide) {
-          fireSlideEnter();
-
-          // dispatch for shiny
-          if (window.jQuery) {
-            if (previousSlide) {
-              window.jQuery(previousSlide).trigger("hidden");
-            }
-            if (currentSlide) {
-              window.jQuery(currentSlide).trigger("shown");
-            }
-          }
-        }
-
-        // hookup for slidy
-        if (window.w3c_slidy) {
-          window.w3c_slidy.add_observer(function (slide_num) {
-            // slide_num starts at position 1
-            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
-          });
-        }
-
-      })();
-    </script>
-
     <script id="quarto-html-after-body" type="application/javascript">
       window.document.addEventListener("DOMContentLoaded", function (event) {
         const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
