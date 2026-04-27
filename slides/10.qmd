@@ -16,7 +16,7 @@ title: Interpreting what ConvNets learn
 - ConvNet representations are visual concepts, so we can often inspect them directly
 - The chapter focuses on three accessible techniques for visualizing and interpreting these representations
 
- 
+
 
 
 ## Three ways to look inside a ConvNet
@@ -27,7 +27,7 @@ title: Interpreting what ConvNets learn
 | Filter visualization | What pattern is a particular filter looking for? |
 | Grad-CAM / class activation maps | What image regions contributed to this classification? |
 
- 
+
 
 ## Intermediate activations
 
@@ -36,7 +36,7 @@ title: Interpreting what ConvNets learn
 - Early layers preserve much of the original image structure
 - Later layers become sparser, more abstract, and more class-oriented
 
- 
+
 
 ## Activations through the network
 
@@ -60,7 +60,7 @@ title: Interpreting what ConvNets learn
 
 ![Attempts to draw a bicycle from memory, compared with a schematic bicycle (Figure 10.4).](images/ch10-fig10-04-bicycles.png){fig-align="center" height="430" fig-alt="Hand-drawn attempts to draw bicycles from memory next to a correct schematic bicycle."}
 
- 
+
 
 
 ## Filter visualization
@@ -74,7 +74,7 @@ title: Interpreting what ConvNets learn
 
 ![Filter patterns for Xception layers at different depths (Figure 10.6).](images/ch10-fig10-06-all-filters.png){fig-align="center" height="500" fig-alt="Grids of synthetic filter patterns showing simple early-layer patterns and more complex texture-like patterns in later layers."}
 
- 
+
 ## Gradient ascent in input space
 
 The recipe:
@@ -85,7 +85,7 @@ The recipe:
 4. Update the image to increase the filter activation
 5. Post-process the result into something viewable
 
- 
+
 
 
 ## Grad-CAM
@@ -106,10 +106,26 @@ The recipe:
 
 | Step | Intuition |
 |:--|:--|
-| Get final conv-layer feature maps | Preserve rough spatial layout |
-| Compute gradients for the target class | Measure which channels matter for the class |
+| Get final conv-layer feature maps | Preserve rough spatial layout for visualization |
+| Compute gradients for the target class | Measure which *channels* matter for the class |
 | Weight feature maps by those gradients | Keep evidence relevant to the decision |
-| Average, keep positive values, and normalize | Produce a 2D heatmap |
-| Overlay on the image | Make the explanation inspectable |
+| Average, keep positive values, and normalize | Produce a 2D heatmap for visualization |
+
+:::: notes
+If asked *why gradients indicate importance*: the gradient of the class score with respect to a feature map answers "if this channel were slightly more active, would the class score go up?"
+More precisely, to first order $y_c \approx \text{const} + \text{gradient} \cdot \text{activation}$, so the gradient tells us which activations contribute to the classification.
+::::
 
 
+## Takeaways
+
+- **ConvNets learn a hierarchy**: pixels → edges/textures → parts → task-relevant concepts
+- **Three complementary lenses** let us inspect that hierarchy:
+    - Activations show *how one input flows* through the network
+    - Filter visualizations show *what each unit is tuned to*
+    - Grad-CAM shows *where evidence for a class lives* in the image
+- Deep representations are **shaped by the task**, not by the image — the bicycle drawings are us, too
+
+:::: notes
+Good place to invite the room: which of these would you actually reach for first on your own models, and why?
+::::
