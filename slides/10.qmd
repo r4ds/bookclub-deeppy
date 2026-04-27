@@ -4,9 +4,9 @@ title: Interpreting what ConvNets learn
 
 ## Learning objectives
 
--   Understand why ConvNets are more interpretable than many other deep learning models
--   Learn three visualization techniques: intermediate activations, filter patterns, and class activation maps
--   Understand how class activation maps localize image regions involved in a classification
+-   Visualize intermediate activations to see how ConvNet layers transform an input image
+-   Use gradient ascent to visualize the patterns that individual ConvNet filters respond to
+-   Use Grad-CAM to identify which image regions contributed to a class prediction
 
 
 ## Why this chapter matters
