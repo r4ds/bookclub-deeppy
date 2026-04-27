@@ -16,9 +16,7 @@ title: Interpreting what ConvNets learn
 - ConvNet representations are visual concepts, so we can often inspect them directly
 - The chapter focuses on three accessible techniques for visualizing and interpreting these representations
 
-:::: notes
-- Introduce the chapter as a bridge from building image classifiers to inspecting what they learn.
-::::
+ 
 
 
 ## Three ways to look inside a ConvNet
@@ -29,10 +27,7 @@ title: Interpreting what ConvNets learn
 | Filter visualization | What pattern is a particular filter looking for? |
 | Grad-CAM / class activation maps | What image regions contributed to this classification? |
 
-:::: notes
-- These are complementary. Activations are input-specific, filters are model-specific, Grad-CAM is decision-specific.
-::::
-
+ 
 
 ## Intermediate activations
 
@@ -41,10 +36,7 @@ title: Interpreting what ConvNets learn
 - Early layers preserve much of the original image structure
 - Later layers become sparser, more abstract, and more class-oriented
 
-:::: notes
-- This is the most direct continuation from Chapter 8's cats-vs-dogs model.
-::::
-
+ 
 
 ## Activations through the network
 
@@ -62,18 +54,13 @@ title: Interpreting what ConvNets learn
 - This is why a high-level representation may be excellent for classification and poor for reconstruction
 - The model is not preserving the image; it is preserving what helps solve the task
 
-:::: notes
-- Connect this to the book's bicycle memory example: we remember high-level concepts better than exact visual details.
-::::
 
 
 ## The bicycle memory analogy
 
 ![Attempts to draw a bicycle from memory, compared with a schematic bicycle (Figure 10.4).](images/ch10-fig10-04-bicycles.png){fig-align="center" height="430" fig-alt="Hand-drawn attempts to draw bicycles from memory next to a correct schematic bicycle."}
 
-:::: notes
-- Use this as a human-scale analogy: abstraction is useful, but it drops exact visual detail.
-::::
+ 
 
 
 ## Filter visualization
@@ -83,16 +70,11 @@ title: Interpreting what ConvNets learn
 - The result is a synthetic pattern the filter responds to strongly
 - Earlier filters tend to look like edges and colors; later filters look like textures or object-like fragments
 
-
 ## Filters across layers
 
 ![Filter patterns for Xception layers at different depths (Figure 10.6).](images/ch10-fig10-06-all-filters.png){fig-align="center" height="500" fig-alt="Grids of synthetic filter patterns showing simple early-layer patterns and more complex texture-like patterns in later layers."}
 
-:::: notes
-- The useful contrast is not one filter, but the progression across depth.
-::::
-
-
+ 
 ## Gradient ascent in input space
 
 The recipe:
@@ -103,30 +85,21 @@ The recipe:
 4. Update the image to increase the filter activation
 5. Post-process the result into something viewable
 
-:::: notes
-- Emphasize the direction: we are not training the model here. The model is fixed; the input image is what changes.
-::::
+ 
 
 
 ## Grad-CAM
 
 - Grad-CAM produces a heatmap for a particular class prediction
-- It weights the last convolutional feature maps by how important each channel is to the target class
+- It weights the last convolutional feature *maps* by how important each channel is to the target class
 - The heatmap answers: **where did the model find evidence for this class?**
 - Useful for debugging classification mistakes and localizing objects in images
-
-:::: notes
-- In the chapter's elephant example, the heatmap highlights ears, which helps explain "African elephant" vs related classes.
-::::
 
 
 ## Grad-CAM overlay
 
 ![African elephant class activation heatmap over the test picture (Figure 10.9).](images/ch10-fig10-09-elephant-grad-cam.jpg){fig-align="center" height="480" fig-alt="An elephant photo with a colored Grad-CAM heatmap highlighting regions that contributed to the African elephant prediction."}
 
-:::: notes
-- The heatmap shows why the network predicted "African elephant."
-::::
 
 
 ## What Grad-CAM is doing
