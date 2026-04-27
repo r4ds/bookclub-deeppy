@@ -6,18 +6,18 @@ title: Interpreting what ConvNets learn
 
 -   Understand why ConvNets are more interpretable than many other deep learning models
 -   Learn three visualization techniques: intermediate activations, filter patterns, and class activation maps
--   Discuss what these techniques can and cannot tell us about model decisions
+-   Understand how class activation maps localize image regions involved in a classification
 
 
 ## Why this chapter matters
 
 - Chapter 8 and 9 taught us to build image classifiers; Chapter 10 asks **what did the classifier learn?**
-- Interpretability matters most when the model supports human judgment: medical imaging, safety, science, auditing
+- Interpretability is especially relevant when deep learning complements human expertise, such as medical imaging
 - ConvNet representations are visual concepts, so we can often inspect them directly
-- The goal is not perfect explanation; it is better debugging and better questions
+- The chapter focuses on three accessible techniques for visualizing and interpreting these representations
 
 :::: notes
-- Ask the group: "When would accuracy alone be insufficient for trusting a vision model?"
+- Introduce the chapter as a bridge from building image classifiers to inspecting what they learn.
 ::::
 
 
@@ -43,7 +43,6 @@ title: Interpreting what ConvNets learn
 
 :::: notes
 - This is the most direct continuation from Chapter 8's cats-vs-dogs model.
-- Good discussion hook: "What does it mean for a later layer to know less about pixels but more about the answer?"
 ::::
 
 
@@ -52,7 +51,7 @@ title: Interpreting what ConvNets learn
 ![Every channel of every layer activation on the test cat picture (Figure 10.3).](images/ch10-fig10-03-all-activations.png){fig-align="center" height="520" fig-alt="Grid of activation channels across successive convolution and pooling layers, becoming more sparse and abstract with depth."}
 
 :::: notes
-- Ask what changes as we move deeper: visual recognizability, sparsity, and class relevance.
+- Point out visual recognizability, sparsity, and class relevance as the activations get deeper.
 ::::
 
 
@@ -109,23 +108,12 @@ The recipe:
 ::::
 
 
-## `predict(x)` vs `model(x)`
-
-- `predict(x)` is for ordinary inference: it batches data and returns NumPy values
-- `model(x)` is used when we need differentiable computation inside a gradient loop
-- For filter visualization and Grad-CAM, we need gradients through the model call
-
-:::: notes
-- This is a practical Keras detail that often trips people up. Use `predict()` by default, but use `model(x)` when writing custom gradient logic.
-::::
-
-
 ## Grad-CAM
 
 - Grad-CAM produces a heatmap for a particular class prediction
 - It weights the last convolutional feature maps by how important each channel is to the target class
 - The heatmap answers: **where did the model find evidence for this class?**
-- Useful for debugging mistakes and checking whether the model is relying on plausible image regions
+- Useful for debugging classification mistakes and localizing objects in images
 
 :::: notes
 - In the chapter's elephant example, the heatmap highlights ears, which helps explain "African elephant" vs related classes.
@@ -137,7 +125,7 @@ The recipe:
 ![African elephant class activation heatmap over the test picture (Figure 10.9).](images/ch10-fig10-09-elephant-grad-cam.jpg){fig-align="center" height="480" fig-alt="An elephant photo with a colored Grad-CAM heatmap highlighting regions that contributed to the African elephant prediction."}
 
 :::: notes
-- Ask whether this makes the prediction more trustworthy, and what a suspicious heatmap would look like.
+- The heatmap shows why the network predicted "African elephant."
 ::::
 
 
@@ -148,34 +136,7 @@ The recipe:
 | Get final conv-layer feature maps | Preserve rough spatial layout |
 | Compute gradients for the target class | Measure which channels matter for the class |
 | Weight feature maps by those gradients | Keep evidence relevant to the decision |
-| Average and normalize | Produce a 2D heatmap |
+| Average, keep positive values, and normalize | Produce a 2D heatmap |
 | Overlay on the image | Make the explanation inspectable |
 
-
-## Interpretable does not mean infallible
-
-- Visualizations can be suggestive without being complete explanations
-- A plausible heatmap does not prove the model learned the right causal features
-- Low-resolution heatmaps can hide important details
-- These tools are best used with examples, counterexamples, and domain expertise
-
-:::: notes
-- Ask: "What would convince you that a model is using the wrong evidence?"
-::::
-
-
-## Practical uses
-
-- Debug a model that is confidently wrong
-- Compare models trained with different data or augmentations
-- Check for shortcut learning, such as watermarks, borders, backgrounds, or scanner artifacts
-- Communicate model behavior to collaborators who are not reading weights or code
-
-
-## Discussion questions
-
-1. Which visualization technique felt most useful: activations, filter visualization, or Grad-CAM?
-2. If a model predicts correctly but the heatmap highlights the wrong region, what should you do?
-3. Where have you seen or suspected shortcut learning in real image tasks?
-4. How much interpretability is enough before using a vision model in a high-stakes setting?
 
