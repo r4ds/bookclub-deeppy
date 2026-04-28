@@ -2,42 +2,50 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://r4ds.github.io/bookclub-deeppy/index.html</loc>
-    <lastmod>2026-04-15T11:02:13.270Z</lastmod>
-  </url>
-  <url>
-    <loc>https://r4ds.github.io/bookclub-deeppy/05.html</loc>
-    <lastmod>2026-04-15T11:04:18.790Z</lastmod>
-  </url>
-  <url>
-    <loc>https://r4ds.github.io/bookclub-deeppy/01.html</loc>
-    <lastmod>2026-04-15T11:04:18.788Z</lastmod>
-  </url>
-  <url>
-    <loc>https://r4ds.github.io/bookclub-deeppy/slides/05.html</loc>
-    <lastmod>2026-04-15T11:02:13.271Z</lastmod>
-  </url>
-  <url>
-    <loc>https://r4ds.github.io/bookclub-deeppy/slides/01.html</loc>
-    <lastmod>2026-04-15T11:02:13.271Z</lastmod>
-  </url>
-  <url>
-    <loc>https://r4ds.github.io/bookclub-deeppy/slides/00.html</loc>
-    <lastmod>2026-04-15T11:02:13.271Z</lastmod>
-  </url>
-  <url>
-    <loc>https://r4ds.github.io/bookclub-deeppy/slides/02.html</loc>
-    <lastmod>2026-04-15T11:02:13.271Z</lastmod>
-  </url>
-  <url>
-    <loc>https://r4ds.github.io/bookclub-deeppy/slides/08.html</loc>
-    <lastmod>2026-04-15T11:02:13.271Z</lastmod>
-  </url>
-  <url>
-    <loc>https://r4ds.github.io/bookclub-deeppy/02.html</loc>
-    <lastmod>2026-04-15T11:04:18.789Z</lastmod>
+    <lastmod>2026-04-28T20:49:36.519Z</lastmod>
   </url>
   <url>
     <loc>https://r4ds.github.io/bookclub-deeppy/08.html</loc>
-    <lastmod>2026-04-15T11:04:18.790Z</lastmod>
+    <lastmod>2026-04-28T20:51:34.783Z</lastmod>
+  </url>
+  <url>
+    <loc>https://r4ds.github.io/bookclub-deeppy/02.html</loc>
+    <lastmod>2026-04-28T20:51:34.782Z</lastmod>
+  </url>
+  <url>
+    <loc>https://r4ds.github.io/bookclub-deeppy/slides/10.html</loc>
+    <lastmod>2026-04-28T20:49:36.520Z</lastmod>
+  </url>
+  <url>
+    <loc>https://r4ds.github.io/bookclub-deeppy/slides/05.html</loc>
+    <lastmod>2026-04-28T20:49:36.520Z</lastmod>
+  </url>
+  <url>
+    <loc>https://r4ds.github.io/bookclub-deeppy/slides/01.html</loc>
+    <lastmod>2026-04-28T20:49:36.520Z</lastmod>
+  </url>
+  <url>
+    <loc>https://r4ds.github.io/bookclub-deeppy/slides/00.html</loc>
+    <lastmod>2026-04-28T20:49:36.519Z</lastmod>
+  </url>
+  <url>
+    <loc>https://r4ds.github.io/bookclub-deeppy/slides/02.html</loc>
+    <lastmod>2026-04-28T20:49:36.520Z</lastmod>
+  </url>
+  <url>
+    <loc>https://r4ds.github.io/bookclub-deeppy/slides/08.html</loc>
+    <lastmod>2026-04-28T20:49:36.520Z</lastmod>
+  </url>
+  <url>
+    <loc>https://r4ds.github.io/bookclub-deeppy/01.html</loc>
+    <lastmod>2026-04-28T20:51:34.781Z</lastmod>
+  </url>
+  <url>
+    <loc>https://r4ds.github.io/bookclub-deeppy/05.html</loc>
+    <lastmod>2026-04-28T20:51:34.782Z</lastmod>
+  </url>
+  <url>
+    <loc>https://r4ds.github.io/bookclub-deeppy/10.html</loc>
+    <lastmod>2026-04-28T20:51:34.784Z</lastmod>
   </url>
 </urlset>

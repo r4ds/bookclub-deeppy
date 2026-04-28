@@ -10,24 +10,122 @@
     ]
   },
   {
-    "objectID": "05.html",
-    "href": "05.html",
-    "title": "5. Fundamentals of machine learning",
+    "objectID": "08.html",
+    "href": "08.html",
+    "title": "8. Image classification",
     "section": "",
-    "text": "Fundamentals of machine learning\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "Image classification\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "5. Fundamentals of machine learning"
+      "8. Image classification"
     ]
   },
   {
-    "objectID": "01.html",
-    "href": "01.html",
-    "title": "1. What is deep learning?",
+    "objectID": "02.html",
+    "href": "02.html",
+    "title": "2. The mathematical building blocks of neural networks",
     "section": "",
-    "text": "What is deep learning?\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "The mathematical building blocks of neural networks\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "1. What is deep learning?"
+      "2. The mathematical building blocks of neural networks"
     ]
+  },
+  {
+    "objectID": "slides/10.html#learning-objectives",
+    "href": "slides/10.html#learning-objectives",
+    "title": "Interpreting what ConvNets learn",
+    "section": "Learning objectives",
+    "text": "Learning objectives\n\nVisualize intermediate activations to see how ConvNet layers transform an input image\nUse gradient ascent to visualize the patterns that individual ConvNet filters respond to\nUse Grad-CAM to identify which image regions contributed to a class prediction"
+  },
+  {
+    "objectID": "slides/10.html#why-this-chapter-matters",
+    "href": "slides/10.html#why-this-chapter-matters",
+    "title": "Interpreting what ConvNets learn",
+    "section": "Why this chapter matters",
+    "text": "Why this chapter matters\n\nChapter 8 and 9 taught us to build image classifiers; Chapter 10 asks what did the classifier learn?\nInterpretability is especially relevant when deep learning complements human expertise, such as medical imaging\nConvNet representations are visual concepts, so we can often inspect them directly\nThe chapter focuses on three accessible techniques for visualizing and interpreting these representations"
+  },
+  {
+    "objectID": "slides/10.html#three-ways-to-look-inside-a-convnet",
+    "href": "slides/10.html#three-ways-to-look-inside-a-convnet",
+    "title": "Interpreting what ConvNets learn",
+    "section": "Three ways to look inside a ConvNet",
+    "text": "Three ways to look inside a ConvNet\n\n\n\n\n\n\n\nTechnique\nQuestion it helps answer\n\n\n\n\nIntermediate activations\nHow does this specific input get transformed layer by layer?\n\n\nFilter visualization\nWhat pattern is a particular filter looking for?\n\n\nGrad-CAM / class activation maps\nWhat image regions contributed to this classification?"
+  },
+  {
+    "objectID": "slides/10.html#intermediate-activations",
+    "href": "slides/10.html#intermediate-activations",
+    "title": "Interpreting what ConvNets learn",
+    "section": "Intermediate activations",
+    "text": "Intermediate activations\n\nFeed one image through the model and collect outputs from the convolution and pooling layers\nEach activation tensor is a stack of 2D feature maps: one spatial map per channel\nEarly layers preserve much of the original image structure\nLater layers become sparser, more abstract, and more class-oriented"
+  },
+  {
+    "objectID": "slides/10.html#activations-through-the-network",
+    "href": "slides/10.html#activations-through-the-network",
+    "title": "Interpreting what ConvNets learn",
+    "section": "Activations through the network",
+    "text": "Activations through the network\n\n\n\nEvery channel of every layer activation on the test cat picture (Figure 10.3).\n\n\n\n\nPoint out visual recognizability, sparsity, and class relevance as the activations get deeper."
+  },
+  {
+    "objectID": "slides/10.html#information-distillation",
+    "href": "slides/10.html#information-distillation",
+    "title": "Interpreting what ConvNets learn",
+    "section": "Information distillation",
+    "text": "Information distillation\n\nConvNets repeatedly transform the input: pixels → edges/textures → parts → task-relevant concepts\nDeeper layers discard details that are irrelevant to the training objective\nThis is why a high-level representation may be excellent for classification and poor for reconstruction\nThe model is not preserving the image; it is preserving what helps solve the task"
+  },
+  {
+    "objectID": "slides/10.html#the-bicycle-memory-analogy",
+    "href": "slides/10.html#the-bicycle-memory-analogy",
+    "title": "Interpreting what ConvNets learn",
+    "section": "The bicycle memory analogy",
+    "text": "The bicycle memory analogy\n\n\n\nAttempts to draw a bicycle from memory, compared with a schematic bicycle (Figure 10.4)."
+  },
+  {
+    "objectID": "slides/10.html#filter-visualization",
+    "href": "slides/10.html#filter-visualization",
+    "title": "Interpreting what ConvNets learn",
+    "section": "Filter visualization",
+    "text": "Filter visualization\n\nInstead of asking “what activates on this image?”, ask “what image would maximally activate this filter?”\nStart from random noise and use gradient ascent on the input image\nThe result is a synthetic pattern the filter responds to strongly\nEarlier filters tend to look like edges and colors; later filters look like textures or object-like fragments"
+  },
+  {
+    "objectID": "slides/10.html#filters-across-layers",
+    "href": "slides/10.html#filters-across-layers",
+    "title": "Interpreting what ConvNets learn",
+    "section": "Filters across layers",
+    "text": "Filters across layers\n\n\n\nFilter patterns for Xception layers at different depths (Figure 10.6)."
+  },
+  {
+    "objectID": "slides/10.html#gradient-ascent-in-input-space",
+    "href": "slides/10.html#gradient-ascent-in-input-space",
+    "title": "Interpreting what ConvNets learn",
+    "section": "Gradient ascent in input space",
+    "text": "Gradient ascent in input space\nThe recipe:\n\nChoose a layer and filter\nDefine a loss: the mean activation of that filter\nCompute gradients of the loss with respect to the input image\nUpdate the image to increase the filter activation\nPost-process the result into something viewable"
+  },
+  {
+    "objectID": "slides/10.html#grad-cam",
+    "href": "slides/10.html#grad-cam",
+    "title": "Interpreting what ConvNets learn",
+    "section": "Grad-CAM",
+    "text": "Grad-CAM\n\nGrad-CAM produces a heatmap for a particular class prediction\nIt weights the last convolutional feature maps by how important each channel is to the target class\nThe heatmap answers: where did the model find evidence for this class?\nUseful for debugging classification mistakes and localizing objects in images"
+  },
+  {
+    "objectID": "slides/10.html#grad-cam-overlay",
+    "href": "slides/10.html#grad-cam-overlay",
+    "title": "Interpreting what ConvNets learn",
+    "section": "Grad-CAM overlay",
+    "text": "Grad-CAM overlay\n\n\n\nAfrican elephant class activation heatmap over the test picture (Figure 10.9)."
+  },
+  {
+    "objectID": "slides/10.html#what-grad-cam-is-doing",
+    "href": "slides/10.html#what-grad-cam-is-doing",
+    "title": "Interpreting what ConvNets learn",
+    "section": "What Grad-CAM is doing",
+    "text": "What Grad-CAM is doing\n\n\n\n\n\n\n\nStep\nIntuition\n\n\n\n\nGet final conv-layer feature maps\nPreserve rough spatial layout for visualization\n\n\nCompute gradients for the target class\nMeasure which channels matter for the class\n\n\nWeight feature maps by those gradients\nKeep evidence relevant to the decision\n\n\nAverage, keep positive values, and normalize\nProduce a 2D heatmap for visualization\n\n\n\n\nIf asked why gradients indicate importance: the gradient of the class score with respect to a feature map answers “if this channel were slightly more active, would the class score go up?” More precisely, to first order \\(y_c \\approx \\text{const} + \\text{gradient} \\cdot \\text{activation}\\), so the gradient tells us which activations contribute to the classification."
+  },
+  {
+    "objectID": "slides/10.html#takeaways",
+    "href": "slides/10.html#takeaways",
+    "title": "Interpreting what ConvNets learn",
+    "section": "Takeaways",
+    "text": "Takeaways\n\nConvNets learn a hierarchy: pixels → edges/textures → parts → task-relevant concepts\nThree complementary lenses let us inspect that hierarchy:\n\nActivations show how one input flows through the network\nFilter visualizations show what each unit is tuned to\nGrad-CAM shows where evidence for a class lives in the image\n\nDeep representations are shaped by the task, not by the image — the bicycle drawings are us, too\n\n\nGood place to invite the room: which of these would you actually reach for first on your own models, and why?"
   },
   {
     "objectID": "slides/05.html#learning-objectives",
@@ -556,23 +654,33 @@
     "text": "Discussion questions\n\nDid you try the code in the chapter? What was your experience with training from scratch, augmentation, and pretrained models?\nWhat are some examples of vision problems you might want to solve with small data?\n\nFor a fixed labeling budget, would you spend effort on more data, better augmentation, or a larger pretrained backbone — and in what order?"
   },
   {
-    "objectID": "02.html",
-    "href": "02.html",
-    "title": "2. The mathematical building blocks of neural networks",
+    "objectID": "01.html",
+    "href": "01.html",
+    "title": "1. What is deep learning?",
     "section": "",
-    "text": "The mathematical building blocks of neural networks\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "What is deep learning?\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "2. The mathematical building blocks of neural networks"
+      "1. What is deep learning?"
     ]
   },
   {
-    "objectID": "08.html",
-    "href": "08.html",
-    "title": "8. Image classification",
+    "objectID": "05.html",
+    "href": "05.html",
+    "title": "5. Fundamentals of machine learning",
     "section": "",
-    "text": "Image classification\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "Fundamentals of machine learning\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "8. Image classification"
+      "5. Fundamentals of machine learning"
+    ]
+  },
+  {
+    "objectID": "10.html",
+    "href": "10.html",
+    "title": "10. Interpreting what ConvNets learn",
+    "section": "",
+    "text": "Interpreting what ConvNets learn\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "crumbs": [
+      "10. Interpreting what ConvNets learn"
     ]
   }
 ]
