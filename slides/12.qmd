@@ -4,10 +4,9 @@ title: Object detection
 
 ## Learning objectives
 
--   Explain what object detection adds beyond image classification
+-   Understand what object detection is about
 -   Compare two-stage and single-stage object detectors
 -   Describe how a YOLO-style detector represents boxes, classes, and confidence
--   Understand why IoU and multi-scale features matter for detection
 
 
 ## Why this chapter matters
@@ -38,6 +37,8 @@ For each detected object, the model needs three things:
 1. **Class label**: what kind of object is this?
 2. **Bounding box**: where is it?
 3. **Confidence score**: how sure is the model?
+
+![Object detectors draw boxes around objects in an image and label them (Figure 12.1).](images/ch12-fig12-01-object-detection.png){fig-align="center" height="300" fig-alt="Photo of a street scene with bounding boxes around detected objects such as people, cars, and traffic lights."}
 
 :::: notes
 The confidence score is not just a convenience for display. It is what lets us filter predictions, tune precision/recall tradeoffs, and decide whether downstream code should trust a detection.
@@ -78,15 +79,7 @@ The important mental shift: detection becomes a dense prediction problem over im
 
 ## YOLO in one picture
 
-```{mermaid}
-flowchart LR
-  image[Input image] --> backbone[ConvNet backbone]
-  backbone --> grid[Feature grid]
-  grid --> boxHead[Box plus confidence]
-  grid --> classHead[Class probabilities]
-  boxHead --> detections[Final detections]
-  classHead --> detections
-```
+![YOLO outputs as visualized in the first YOLO paper (Figure 12.4).](images/ch12-fig12-04-yolo-diagram.png){fig-align="center" height="500" fig-alt="Diagram showing a YOLO-style object detector splitting an image into a grid and predicting bounding boxes and class probabilities."}
 
 
 ## The YOLO grid
@@ -205,9 +198,12 @@ The chapter's simplified model is useful for learning, but not production-ready:
     - small objects need high-resolution features
     - large objects need broader semantic context
 
-- "Feature Pyramid Network" combines these:
-   - Upsample (Conv2DTranspose) semantic context
-   - Connect latterly with the feature maps at same resolution.
+## Feature Pyramid Network solution
+
+- Upsample (Conv2DTranspose) semantic context
+- Connect laterally with the feature maps at same resolution.
+
+![A feature pyramid network creates semantically interesting feature maps at different scales (Figure 12.8).](images/ch12-fig12-08-feature-pyramid-network.png){fig-align="center" height="260" fig-alt="Diagram of a feature pyramid network combining high-level semantic features with earlier high-resolution feature maps through upsampling and lateral connections."}
 
 
 ## Practical model choice
