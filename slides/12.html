@@ -9,7 +9,7 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.9.38">
 
-  <title>Deep Learning with Python (3e) Book Club – Image classification</title>
+  <title>Deep Learning with Python (3e) Book Club – Object detection</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -129,7 +129,7 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Image classification</h1>
+  <h1 class="title">Object detection</h1>
 
 <div class="quarto-title-authors">
 </div>
@@ -138,23 +138,21 @@
 <section id="learning-objectives" class="slide level2">
 <h2>Learning objectives</h2>
 <ul>
-<li>Understand how convolutional networks match the structure of image data</li>
-<li>Learn how data augmentation helps mitigate overfitting.</li>
-<li>Learn to use pretrained models for small data problem (the usual case!)</li>
+<li>Understand what object detection is about</li>
+<li>Compare two-stage and single-stage object detectors</li>
+<li>Describe how a YOLO-style detector represents boxes, classes, and confidence</li>
 </ul>
 </section>
 <section id="why-this-chapter-matters" class="slide level2">
 <h2>Why this chapter matters</h2>
 <ul>
-<li>Computer vision was an early showcase for deep learning (competitions through the 2010s helped establish CNNs)</li>
-<li>Convolutional neural networks (ConvNets / CNNs) remain the default backbone for many vision pipelines</li>
-<li>CNN’s are a good first example of how to design architectures with inductive biases that match the data structure</li>
-<li>Most practitioners face <strong>small or medium</strong> labeled sets, not web-scale data — the chapter centers that reality</li>
+<li>Image classification answers: <strong>what is in the image?</strong></li>
+<li>Object detection answers: <strong>what is in the image, and where is it?</strong></li>
+<li>Detection is often enough for counting, tracking, cropping, and routing images to other systems</li>
+<li>It is cheaper to label and usually faster to run than full image segmentation</li>
 </ul>
 <aside class="notes">
-<ul>
-<li>Ask the group where they already use vision models (phones, search, medical imaging, etc.).</li>
-</ul>
+<p>Good opening question: when would a bounding box be enough, and when would you need a pixel-level mask?</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -167,40 +165,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="dense-layers-vs-convolutions-on-images" class="slide level2 compact-slide">
-<h2>Dense layers vs convolutions on images</h2>
-<ul>
-<li><strong>Dense</strong> layers learn <strong>global</strong> relationships over the whole flattened input</li>
-<li><strong>Conv</strong> layers learn <strong>local</strong> patterns in small spatial windows, reused everywhere on the grid</li>
-<li>Two consequences the book stresses: <strong>translation invariance</strong> (same motif anywhere on the image) and a <strong>spatial hierarchy</strong> (edges → textures → parts → objects)</li>
-</ul>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="images/ch08-fig08-02-spatial-hierarchy.png" alt="Diagram: low-level lines and textures combine into parts such as eyes, then into a high-level cat concept." height="240"></p>
-<figcaption>Spatial hierarchy of patterns from the book’s Figure 8.2.</figcaption>
-</figure>
-</div>
-</section>
-<section id="convolution-in-one-pass" class="slide level2">
-<h2>Convolution in one pass</h2>
-<ul>
-<li>A <strong>kernel</strong> slides over the height–width grid; each location produces one vector of <strong>filter responses</strong> by dotting the kernel with the local patch of pixels</li>
-<li>Output <strong>depth</strong> = number of filters; each channel is a <strong>feature map</strong> (where that filter fires)</li>
-<li><strong>Padding</strong> (<code>valid</code> vs <code>same</code>): control border shrinkage vs keeping spatial size</li>
-<li><strong>Stride</strong> &gt; 1: skip positions and downsample (common in other architectures; classification stacks often prefer pooling instead)</li>
-<li>Excellent you-tube video: <a href="https://www.youtube.com/watch?v=HGwBXDKFk9I&amp;t=78s">Statquest</a></li>
-</ul>
-</section>
-<section id="max-pooling" class="slide level2">
-<h2>Max pooling</h2>
-<ul>
-<li>Fixed <strong>max</strong> over small windows (often 2×2, stride 2) — halves spatial size per axis, no learned weights inside the pool</li>
-<li><strong>Downsamples</strong> aggressively so deeper layers see broader context without exploding parameters</li>
-<li>The book contrasts removing pooling: spatial maps stay large and the parameter burden grows</li>
-</ul>
-</section>
-<section id="simple-convnet" class="slide level2 simple-convnet-table">
-<h2>Simple Convnet</h2>
+<section id="detection-vs-segmentation" class="slide level2">
+<h2>Detection vs segmentation</h2>
 <table class="caption-top">
 <colgroup>
 <col style="width: 33%">
@@ -209,130 +175,46 @@
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;">Layer (type)</th>
-<th style="text-align: left;">Output shape</th>
-<th style="text-align: right;">Param #</th>
+<th style="text-align: left;">Task</th>
+<th style="text-align: left;">Output</th>
+<th style="text-align: left;">Cost profile</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">input_layer_2 (InputLayer)</td>
-<td style="text-align: left;">(None, 180, 180, 3)</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: left;">Classification</td>
+<td style="text-align: left;">One or more image-level labels</td>
+<td style="text-align: left;">Cheapest labels and fastest inference</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">rescaling (Rescaling)</td>
-<td style="text-align: left;">(None, 180, 180, 3)</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: left;">Object detection</td>
+<td style="text-align: left;">Labels plus bounding boxes</td>
+<td style="text-align: left;">Moderate labeling cost; fast enough for many real-time uses</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">conv2d_6 (Conv2D)</td>
-<td style="text-align: left;">(None, 178, 178, 32)</td>
-<td style="text-align: right;">896</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">max_pooling2d_2 (MaxPooling2D)</td>
-<td style="text-align: left;">(None, 89, 89, 32)</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">conv2d_7 (Conv2D)</td>
-<td style="text-align: left;">(None, 87, 87, 64)</td>
-<td style="text-align: right;">18,496</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">max_pooling2d_3 (MaxPooling2D)</td>
-<td style="text-align: left;">(None, 43, 43, 64)</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">conv2d_8 (Conv2D)</td>
-<td style="text-align: left;">(None, 41, 41, 128)</td>
-<td style="text-align: right;">73,856</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">max_pooling2d_4 (MaxPooling2D)</td>
-<td style="text-align: left;">(None, 20, 20, 128)</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">conv2d_9 (Conv2D)</td>
-<td style="text-align: left;">(None, 18, 18, 256)</td>
-<td style="text-align: right;">295,168</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">max_pooling2d_5 (MaxPooling2D)</td>
-<td style="text-align: left;">(None, 9, 9, 256)</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">conv2d_10 (Conv2D)</td>
-<td style="text-align: left;">(None, 7, 7, 512)</td>
-<td style="text-align: right;">1,180,160</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">global_average_pooling2d_2 (GlobalAveragePooling2D)</td>
-<td style="text-align: left;">(None, 512)</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">dense_2 (Dense)</td>
-<td style="text-align: left;">(None, 1)</td>
-<td style="text-align: right;">513</td>
+<td style="text-align: left;">Segmentation</td>
+<td style="text-align: left;">Labels plus pixel-level masks</td>
+<td style="text-align: left;">Most detailed, but expensive to label and compute</td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="understanding-conv2d-parameter-count" class="slide level2">
-<h2>Understanding Conv2D parameter count</h2>
-<ul>
-<li><p><code>filters * (kernel_size^2 * input_channels + 1)</code> (the +1 is for the bias term)</p></li>
-<li><p>For example, the first Conv2D layer has 32 filters, a kernel size of 3x3, and 3 input channels (RGB):</p></li>
-</ul>
-<p><code>32 * (3^2 * 3 + 1)</code> = <code>32 * (27 + 1)</code> = <code>32 * 28</code> = <code>896</code></p>
-</section>
-<section id="cats-and-dogs-train-from-scratch" class="slide level2">
-<h2>Cats and Dogs: train from scratch</h2>
-<ul>
-<li>Deep learning can still help with <strong>limited</strong> labels if you regularize well and use sensible preprocessing</li>
-<li><strong>Preprocessing</strong> (resize, scale, optional RGB vs grayscale) aligns inputs with how the network was designed to see the world</li>
-<li>Expect modest accuracy from scratch on tiny sets — the chapter uses it to set up stronger tools next</li>
-<li>About 78% test accuracy</li>
-</ul>
-</section>
-<section id="data-augmentation" class="slide level2">
-<h2>Data augmentation</h2>
-<ul>
-<li>Random transforms at <strong>training</strong> time (flips, rotations, zooms, color jitter, etc.) artificially expand diversity</li>
-<li>Acts as a strong <strong>regularizer</strong>: the network is pushed not to rely on exact pixel placements or lighting</li>
-<li>Must stay <strong>plausible</strong> for the domain — extreme augmentation can introduce off-manifold examples</li>
-<li>about 84% test accuracy with augmentation</li>
-</ul>
-</section>
-<section id="pretrained-models-feature-extraction" class="slide level2">
-<h2>Pretrained models: feature extraction</h2>
+<section id="what-a-detector-predicts" class="slide level2">
+<h2>What a detector predicts</h2>
+<p>For each detected object, the model needs three things:</p>
+<ol type="1">
+<li><strong>Class label</strong>: what kind of object is this?</li>
+<li><strong>Bounding box</strong>: where is it?</li>
+<li><strong>Confidence score</strong>: how sure is the model?</li>
+</ol>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="images/ch08-fig08-12-swapping-classifier.png" alt="Block diagram: frozen convolutional base feeds into a new dense classifier stack." height="260"></p>
-<figcaption>Reusing a convolutional base with a new classifier head (Figure 8.12).</figcaption>
+<p><img data-src="images/ch12-fig12-01-object-detection.png" alt="Photo of a street scene with bounding boxes around detected objects such as people, cars, and traffic lights." height="300"></p>
+<figcaption>Object detectors draw boxes around objects in an image and label them (Figure 12.1).</figcaption>
 </figure>
 </div>
-<ul>
-<li>Freeze a trained backbone; train only a small head on your labels</li>
-<li>Fast, low data, good when your task is “close enough” to the pretraining distribution</li>
-<li>Without augmentation 98% test accuracy; with augmentation about the same. (why?)</li>
-</ul>
-</section>
-<section id="pretrained-models-fine-tuning" class="slide level2">
-<h2>Pretrained models: Fine-tuning</h2>
-<ul>
-<li>Almost always combined with feature extraction to first train the new layers.</li>
-<li>Unfreeze model weights and train with a smaller learning rate to adapt the pretrained features to your task.</li>
-<li>More data and care needed; risk of overfitting or catastrophic forgetting if done too aggressively</li>
-<li>Test accuracy about 98.6%</li>
-</ul>
 <aside class="notes">
-<p>These techniques are great for small data, which is the case most of use will have to deal with! Discuss.</p>
+<p>The confidence score is not just a convenience for display. It is what lets us filter predictions, tune precision/recall tradeoffs, and decide whether downstream code should trust a detection.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -345,14 +227,320 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="discussion-questions" class="slide level2">
-<h2>Discussion questions</h2>
+<section id="two-broad-families" class="slide level2">
+<h2>Two broad families</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Detector family</th>
+<th style="text-align: left;">Basic idea</th>
+<th style="text-align: left;">Tradeoff</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Two-stage detectors, such as R-CNN</td>
+<td style="text-align: left;">First propose object-like regions, then classify each region</td>
+<td style="text-align: left;">Accurate, but computationally expensive</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Single-stage detectors, such as YOLO, SSD, RetinaNet</td>
+<td style="text-align: left;">Predict boxes and labels in one pass</td>
+<td style="text-align: left;">Faster and more practical for real-time use</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="two-stage-r-cnn-intuition" class="slide level2">
+<h2>Two-stage R-CNN intuition</h2>
+<p>The pipeline:</p>
 <ol type="1">
-<li>Did you try the code in the chapter? What was your experience with training from scratch, augmentation, and pretrained models?</li>
-<li>What are some examples of vision problems you might want to solve with small data?<br>
-</li>
-<li>For a fixed labeling budget, would you spend effort on <strong>more data</strong>, <strong>better augmentation</strong>, or <strong>a larger pretrained backbone</strong> — and in what order?</li>
+<li>Generate thousands of <strong>region proposals</strong></li>
+<li>Classify each proposal with a ConvNet</li>
+<li>Discard low-scoring proposals</li>
+<li>Refine boxes and remove duplicates</li>
 </ol>
+<p>The cost is that the model must reason over many candidate patches for every image.</p>
+</section>
+<section id="single-stage-detectors" class="slide level2">
+<h2>Single-stage detectors</h2>
+<ul>
+<li>A single model predicts both <strong>where</strong> objects are and <strong>what</strong> they are</li>
+<li>YOLO stands for <strong>You Only Look Once</strong></li>
+<li>The chapter builds a simplified version of the original 2015 YOLO model</li>
+<li>Modern YOLO and RetinaNet variants are more complex, but the core representation is similar</li>
+</ul>
+<aside class="notes">
+<p>The important mental shift: detection becomes a dense prediction problem over image regions, not a separate crop-and-classify loop.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="yolo-in-one-picture" class="slide level2">
+<h2>YOLO in one picture</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/ch12-fig12-04-yolo-diagram.png" alt="Diagram showing a YOLO-style object detector splitting an image into a grid and predicting bounding boxes and class probabilities." height="500"></p>
+<figcaption>YOLO outputs as visualized in the first YOLO paper (Figure 12.4).</figcaption>
+</figure>
+</div>
+</section>
+<section id="the-yolo-grid" class="slide level2">
+<h2>The YOLO grid</h2>
+<ul>
+<li>Divide the image into a fixed grid, such as <strong>6 x 6</strong></li>
+<li>Each grid cell predicts:
+<ul>
+<li>one bounding box in the chapter’s simplified model</li>
+<li>one confidence score</li>
+<li>one class-probability vector</li>
+</ul></li>
+<li>A cell is responsible for an object when the object’s center falls inside that cell</li>
+</ul>
+</section>
+<section id="the-output-tensor" class="slide level2">
+<h2>The output tensor</h2>
+<p>In the chapter’s simplified YOLO model:</p>
+<ul>
+<li><code>grid_size = 6</code></li>
+<li><code>num_labels = 91</code> for COCO classes</li>
+<li>Each grid location outputs <code>91 + 5</code> numbers</li>
+<li>The <code>5</code> box numbers are <code>(x, y, w, h, confidence)</code></li>
+<li>The final output shape is <code>6 x 6 x 96</code></li>
+</ul>
+<aside class="notes">
+<p>Useful check for the group: 6 * 6 * 96 = 3,456 output numbers per image.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="coordinate-systems" class="slide level2">
+<h2>Coordinate systems</h2>
+<p>Bounding boxes move through several representations:</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Representation</th>
+<th style="text-align: left;">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">COCO input box</td>
+<td style="text-align: left;"><code>(x, y, width, height)</code> in pixels from the top-left corner</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Normalized box</td>
+<td style="text-align: left;">Same idea, scaled into a <code>[0, 1]</code> unit square</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">YOLO grid box</td>
+<td style="text-align: left;">Center <code>(x, y)</code> relative to a grid cell, plus image-relative width and height</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="preparing-coco-for-yolo" class="slide level2">
+<h2>Preparing COCO for YOLO</h2>
+<ul>
+<li>Load image metadata and annotations from COCO</li>
+<li>Group boxes and labels by image</li>
+<li>Normalize boxes so they are independent of image size</li>
+<li>Build one class map and one box map per image</li>
+<li>Mark grid cells with no object as confidence <code>0</code></li>
+</ul>
+<aside class="notes">
+<p>The chapter filters to images with four or fewer boxes to keep the example runnable. This is a teaching simplification, not a real production constraint.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="why-object-detection-losses-are-different" class="slide level2">
+<h2>Why object detection losses are different</h2>
+<p>Classification loss is familiar:</p>
+<ul>
+<li>compare predicted class probabilities to the true class label</li>
+</ul>
+<p>Box loss needs more structure:</p>
+<ul>
+<li>reward accurate box location and size</li>
+<li>ignore box-placement error for empty cells</li>
+<li>train confidence to be low for empty cells</li>
+<li>train confidence to reflect box quality when an object exists</li>
+</ul>
+</section>
+<section id="intersection-over-union" class="slide level2">
+<h2>Intersection over Union</h2>
+<p>IoU measures how much two boxes overlap:</p>
+<p><span class="math display">\[
+\text{IoU} = \frac{\text{area of overlap}}{\text{area of union}}
+\]</span></p>
+<ul>
+<li><code>1.0</code> means perfect overlap</li>
+<li><code>0.0</code> means no overlap</li>
+<li>In YOLO, IoU becomes the target for confidence when a grid cell contains an object</li>
+</ul>
+</section>
+<section id="the-yolo-box-loss" class="slide level2">
+<h2>The YOLO box loss</h2>
+<p>The chapter’s custom loss combines:</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Part</th>
+<th style="text-align: left;">What it penalizes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>x, y</code> error</td>
+<td style="text-align: left;">Box center in the grid cell</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>w, h</code> error</td>
+<td style="text-align: left;">Box size</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">confidence error</td>
+<td style="text-align: left;">Whether an object exists and how good the predicted box is</td>
+</tr>
+</tbody>
+</table>
+<p>The loss scales up box-placement errors and scales down confidence errors for empty cells.</p>
+</section>
+<section id="training-from-scratch-is-hard" class="slide level2">
+<h2>Training from scratch is hard</h2>
+<p>The chapter’s simplified model is useful for learning, but not production-ready:</p>
+<ul>
+<li>COCO is large, even when filtered</li>
+<li>Training takes significant GPU time</li>
+<li>The example is still undertrained after several epochs</li>
+<li>Real detectors need stronger augmentation, more epochs, and more careful metrics</li>
+<li>Modern detectors usually predict multiple boxes per location and use larger output grids</li>
+</ul>
+</section>
+<section id="retinanet-and-pretrained-detection" class="slide level2">
+<h2>RetinaNet and pretrained detection</h2>
+<ul>
+<li>RetinaNet is also a single-stage detector</li>
+<li>KerasHub provides a pretrained RetinaNet model trained on COCO</li>
+<li>Its outputs are familiar: boxes, confidences, labels, and number of detections</li>
+<li>In practice, starting from a pretrained detector is often more useful than training from scratch</li>
+</ul>
+</section>
+<section id="the-scale-problem" class="slide level2">
+<h2>The scale problem</h2>
+<ul>
+<li>Late ConvNet layers contain rich semantic features, but coarse spatial detail</li>
+<li>Early ConvNet layers preserve fine spatial detail, but weaker semantic meaning</li>
+<li>Object detection needs both:
+<ul>
+<li>small objects need high-resolution features</li>
+<li>large objects need broader semantic context</li>
+</ul></li>
+</ul>
+</section>
+<section id="feature-pyramid-network-solution" class="slide level2">
+<h2>Feature Pyramid Network solution</h2>
+<ul>
+<li>Upsample (Conv2DTranspose) semantic context</li>
+<li>Connect laterally with the feature maps at same resolution.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/ch12-fig12-08-feature-pyramid-network.png" alt="Diagram of a feature pyramid network combining high-level semantic features with earlier high-resolution feature maps through upsampling and lateral connections." height="260"></p>
+<figcaption>A feature pyramid network creates semantically interesting feature maps at different scales (Figure 12.8).</figcaption>
+</figure>
+</div>
+</section>
+<section id="practical-model-choice" class="slide level2">
+<h2>Practical model choice</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Situation</th>
+<th style="text-align: left;">Likely choice</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Need pixel-precise boundaries</td>
+<td style="text-align: left;">Segmentation model</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Need boxes for many images quickly</td>
+<td style="text-align: left;">Single-stage detector</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Need a teaching implementation</td>
+<td style="text-align: left;">Simplified YOLO</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Need useful results soon</td>
+<td style="text-align: left;">Pretrained RetinaNet or modern YOLO</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="takeaways" class="slide level2">
+<h2>Takeaways</h2>
+<ul>
+<li>Object detection localizes objects with <strong>boxes, labels, and confidence scores</strong></li>
+<li>Single-stage detectors make detection a fast, dense prediction problem</li>
+<li>YOLO teaches the core representation: <strong>grid cells predict boxes and classes</strong></li>
+<li>IoU connects localization quality to training and evaluation</li>
+<li>Pretrained multi-scale detectors such as RetinaNet are usually the practical starting point</li>
+</ul>
+<aside class="notes">
+<p>Good closing prompt: after chapters 8-12, the group has seen classification, interpretation, segmentation, and detection. Which vision task feels most useful for your work, and which feels hardest to evaluate?</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 
 
 </section>

@@ -10,23 +10,33 @@
     ]
   },
   {
-    "objectID": "08.html",
-    "href": "08.html",
-    "title": "8. Image classification",
+    "objectID": "10.html",
+    "href": "10.html",
+    "title": "10. Interpreting what ConvNets learn",
     "section": "",
-    "text": "Image classification\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "Interpreting what ConvNets learn\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "8. Image classification"
+      "10. Interpreting what ConvNets learn"
     ]
   },
   {
-    "objectID": "02.html",
-    "href": "02.html",
-    "title": "2. The mathematical building blocks of neural networks",
+    "objectID": "05.html",
+    "href": "05.html",
+    "title": "5. Fundamentals of machine learning",
     "section": "",
-    "text": "The mathematical building blocks of neural networks\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "Fundamentals of machine learning\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "2. The mathematical building blocks of neural networks"
+      "5. Fundamentals of machine learning"
+    ]
+  },
+  {
+    "objectID": "01.html",
+    "href": "01.html",
+    "title": "1. What is deep learning?",
+    "section": "",
+    "text": "What is deep learning?\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "crumbs": [
+      "1. What is deep learning?"
     ]
   },
   {
@@ -654,33 +664,180 @@
     "text": "Discussion questions\n\nDid you try the code in the chapter? What was your experience with training from scratch, augmentation, and pretrained models?\nWhat are some examples of vision problems you might want to solve with small data?\n\nFor a fixed labeling budget, would you spend effort on more data, better augmentation, or a larger pretrained backbone — and in what order?"
   },
   {
-    "objectID": "01.html",
-    "href": "01.html",
-    "title": "1. What is deep learning?",
+    "objectID": "slides/12.html#learning-objectives",
+    "href": "slides/12.html#learning-objectives",
+    "title": "Object detection",
+    "section": "Learning objectives",
+    "text": "Learning objectives\n\nUnderstand what object detection is about\nCompare two-stage and single-stage object detectors\nDescribe how a YOLO-style detector represents boxes, classes, and confidence"
+  },
+  {
+    "objectID": "slides/12.html#why-this-chapter-matters",
+    "href": "slides/12.html#why-this-chapter-matters",
+    "title": "Object detection",
+    "section": "Why this chapter matters",
+    "text": "Why this chapter matters\n\nImage classification answers: what is in the image?\nObject detection answers: what is in the image, and where is it?\nDetection is often enough for counting, tracking, cropping, and routing images to other systems\nIt is cheaper to label and usually faster to run than full image segmentation\n\n\nGood opening question: when would a bounding box be enough, and when would you need a pixel-level mask?"
+  },
+  {
+    "objectID": "slides/12.html#detection-vs-segmentation",
+    "href": "slides/12.html#detection-vs-segmentation",
+    "title": "Object detection",
+    "section": "Detection vs segmentation",
+    "text": "Detection vs segmentation\n\n\n\n\n\n\n\n\nTask\nOutput\nCost profile\n\n\n\n\nClassification\nOne or more image-level labels\nCheapest labels and fastest inference\n\n\nObject detection\nLabels plus bounding boxes\nModerate labeling cost; fast enough for many real-time uses\n\n\nSegmentation\nLabels plus pixel-level masks\nMost detailed, but expensive to label and compute"
+  },
+  {
+    "objectID": "slides/12.html#what-a-detector-predicts",
+    "href": "slides/12.html#what-a-detector-predicts",
+    "title": "Object detection",
+    "section": "What a detector predicts",
+    "text": "What a detector predicts\nFor each detected object, the model needs three things:\n\nClass label: what kind of object is this?\nBounding box: where is it?\nConfidence score: how sure is the model?\n\n\n\n\nObject detectors draw boxes around objects in an image and label them (Figure 12.1).\n\n\n\nThe confidence score is not just a convenience for display. It is what lets us filter predictions, tune precision/recall tradeoffs, and decide whether downstream code should trust a detection."
+  },
+  {
+    "objectID": "slides/12.html#two-broad-families",
+    "href": "slides/12.html#two-broad-families",
+    "title": "Object detection",
+    "section": "Two broad families",
+    "text": "Two broad families\n\n\n\n\n\n\n\n\nDetector family\nBasic idea\nTradeoff\n\n\n\n\nTwo-stage detectors, such as R-CNN\nFirst propose object-like regions, then classify each region\nAccurate, but computationally expensive\n\n\nSingle-stage detectors, such as YOLO, SSD, RetinaNet\nPredict boxes and labels in one pass\nFaster and more practical for real-time use"
+  },
+  {
+    "objectID": "slides/12.html#two-stage-r-cnn-intuition",
+    "href": "slides/12.html#two-stage-r-cnn-intuition",
+    "title": "Object detection",
+    "section": "Two-stage R-CNN intuition",
+    "text": "Two-stage R-CNN intuition\nThe pipeline:\n\nGenerate thousands of region proposals\nClassify each proposal with a ConvNet\nDiscard low-scoring proposals\nRefine boxes and remove duplicates\n\nThe cost is that the model must reason over many candidate patches for every image."
+  },
+  {
+    "objectID": "slides/12.html#single-stage-detectors",
+    "href": "slides/12.html#single-stage-detectors",
+    "title": "Object detection",
+    "section": "Single-stage detectors",
+    "text": "Single-stage detectors\n\nA single model predicts both where objects are and what they are\nYOLO stands for You Only Look Once\nThe chapter builds a simplified version of the original 2015 YOLO model\nModern YOLO and RetinaNet variants are more complex, but the core representation is similar\n\n\nThe important mental shift: detection becomes a dense prediction problem over image regions, not a separate crop-and-classify loop."
+  },
+  {
+    "objectID": "slides/12.html#yolo-in-one-picture",
+    "href": "slides/12.html#yolo-in-one-picture",
+    "title": "Object detection",
+    "section": "YOLO in one picture",
+    "text": "YOLO in one picture\n\n\n\nYOLO outputs as visualized in the first YOLO paper (Figure 12.4)."
+  },
+  {
+    "objectID": "slides/12.html#the-yolo-grid",
+    "href": "slides/12.html#the-yolo-grid",
+    "title": "Object detection",
+    "section": "The YOLO grid",
+    "text": "The YOLO grid\n\nDivide the image into a fixed grid, such as 6 x 6\nEach grid cell predicts:\n\none bounding box in the chapter’s simplified model\none confidence score\none class-probability vector\n\nA cell is responsible for an object when the object’s center falls inside that cell"
+  },
+  {
+    "objectID": "slides/12.html#the-output-tensor",
+    "href": "slides/12.html#the-output-tensor",
+    "title": "Object detection",
+    "section": "The output tensor",
+    "text": "The output tensor\nIn the chapter’s simplified YOLO model:\n\ngrid_size = 6\nnum_labels = 91 for COCO classes\nEach grid location outputs 91 + 5 numbers\nThe 5 box numbers are (x, y, w, h, confidence)\nThe final output shape is 6 x 6 x 96\n\n\nUseful check for the group: 6 * 6 * 96 = 3,456 output numbers per image."
+  },
+  {
+    "objectID": "slides/12.html#coordinate-systems",
+    "href": "slides/12.html#coordinate-systems",
+    "title": "Object detection",
+    "section": "Coordinate systems",
+    "text": "Coordinate systems\nBounding boxes move through several representations:\n\n\n\n\n\n\n\nRepresentation\nMeaning\n\n\n\n\nCOCO input box\n(x, y, width, height) in pixels from the top-left corner\n\n\nNormalized box\nSame idea, scaled into a [0, 1] unit square\n\n\nYOLO grid box\nCenter (x, y) relative to a grid cell, plus image-relative width and height"
+  },
+  {
+    "objectID": "slides/12.html#preparing-coco-for-yolo",
+    "href": "slides/12.html#preparing-coco-for-yolo",
+    "title": "Object detection",
+    "section": "Preparing COCO for YOLO",
+    "text": "Preparing COCO for YOLO\n\nLoad image metadata and annotations from COCO\nGroup boxes and labels by image\nNormalize boxes so they are independent of image size\nBuild one class map and one box map per image\nMark grid cells with no object as confidence 0\n\n\nThe chapter filters to images with four or fewer boxes to keep the example runnable. This is a teaching simplification, not a real production constraint."
+  },
+  {
+    "objectID": "slides/12.html#why-object-detection-losses-are-different",
+    "href": "slides/12.html#why-object-detection-losses-are-different",
+    "title": "Object detection",
+    "section": "Why object detection losses are different",
+    "text": "Why object detection losses are different\nClassification loss is familiar:\n\ncompare predicted class probabilities to the true class label\n\nBox loss needs more structure:\n\nreward accurate box location and size\nignore box-placement error for empty cells\ntrain confidence to be low for empty cells\ntrain confidence to reflect box quality when an object exists"
+  },
+  {
+    "objectID": "slides/12.html#intersection-over-union",
+    "href": "slides/12.html#intersection-over-union",
+    "title": "Object detection",
+    "section": "Intersection over Union",
+    "text": "Intersection over Union\nIoU measures how much two boxes overlap:\n\\[\n\\text{IoU} = \\frac{\\text{area of overlap}}{\\text{area of union}}\n\\]\n\n1.0 means perfect overlap\n0.0 means no overlap\nIn YOLO, IoU becomes the target for confidence when a grid cell contains an object"
+  },
+  {
+    "objectID": "slides/12.html#the-yolo-box-loss",
+    "href": "slides/12.html#the-yolo-box-loss",
+    "title": "Object detection",
+    "section": "The YOLO box loss",
+    "text": "The YOLO box loss\nThe chapter’s custom loss combines:\n\n\n\n\n\n\n\nPart\nWhat it penalizes\n\n\n\n\nx, y error\nBox center in the grid cell\n\n\nw, h error\nBox size\n\n\nconfidence error\nWhether an object exists and how good the predicted box is\n\n\n\nThe loss scales up box-placement errors and scales down confidence errors for empty cells."
+  },
+  {
+    "objectID": "slides/12.html#training-from-scratch-is-hard",
+    "href": "slides/12.html#training-from-scratch-is-hard",
+    "title": "Object detection",
+    "section": "Training from scratch is hard",
+    "text": "Training from scratch is hard\nThe chapter’s simplified model is useful for learning, but not production-ready:\n\nCOCO is large, even when filtered\nTraining takes significant GPU time\nThe example is still undertrained after several epochs\nReal detectors need stronger augmentation, more epochs, and more careful metrics\nModern detectors usually predict multiple boxes per location and use larger output grids"
+  },
+  {
+    "objectID": "slides/12.html#retinanet-and-pretrained-detection",
+    "href": "slides/12.html#retinanet-and-pretrained-detection",
+    "title": "Object detection",
+    "section": "RetinaNet and pretrained detection",
+    "text": "RetinaNet and pretrained detection\n\nRetinaNet is also a single-stage detector\nKerasHub provides a pretrained RetinaNet model trained on COCO\nIts outputs are familiar: boxes, confidences, labels, and number of detections\nIn practice, starting from a pretrained detector is often more useful than training from scratch"
+  },
+  {
+    "objectID": "slides/12.html#the-scale-problem",
+    "href": "slides/12.html#the-scale-problem",
+    "title": "Object detection",
+    "section": "The scale problem",
+    "text": "The scale problem\n\nLate ConvNet layers contain rich semantic features, but coarse spatial detail\nEarly ConvNet layers preserve fine spatial detail, but weaker semantic meaning\nObject detection needs both:\n\nsmall objects need high-resolution features\nlarge objects need broader semantic context"
+  },
+  {
+    "objectID": "slides/12.html#feature-pyramid-network-solution",
+    "href": "slides/12.html#feature-pyramid-network-solution",
+    "title": "Object detection",
+    "section": "Feature Pyramid Network solution",
+    "text": "Feature Pyramid Network solution\n\nUpsample (Conv2DTranspose) semantic context\nConnect laterally with the feature maps at same resolution.\n\n\n\n\nA feature pyramid network creates semantically interesting feature maps at different scales (Figure 12.8)."
+  },
+  {
+    "objectID": "slides/12.html#practical-model-choice",
+    "href": "slides/12.html#practical-model-choice",
+    "title": "Object detection",
+    "section": "Practical model choice",
+    "text": "Practical model choice\n\n\n\nSituation\nLikely choice\n\n\n\n\nNeed pixel-precise boundaries\nSegmentation model\n\n\nNeed boxes for many images quickly\nSingle-stage detector\n\n\nNeed a teaching implementation\nSimplified YOLO\n\n\nNeed useful results soon\nPretrained RetinaNet or modern YOLO"
+  },
+  {
+    "objectID": "slides/12.html#takeaways",
+    "href": "slides/12.html#takeaways",
+    "title": "Object detection",
+    "section": "Takeaways",
+    "text": "Takeaways\n\nObject detection localizes objects with boxes, labels, and confidence scores\nSingle-stage detectors make detection a fast, dense prediction problem\nYOLO teaches the core representation: grid cells predict boxes and classes\nIoU connects localization quality to training and evaluation\nPretrained multi-scale detectors such as RetinaNet are usually the practical starting point\n\n\nGood closing prompt: after chapters 8-12, the group has seen classification, interpretation, segmentation, and detection. Which vision task feels most useful for your work, and which feels hardest to evaluate?"
+  },
+  {
+    "objectID": "02.html",
+    "href": "02.html",
+    "title": "2. The mathematical building blocks of neural networks",
     "section": "",
-    "text": "What is deep learning?\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "The mathematical building blocks of neural networks\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "1. What is deep learning?"
+      "2. The mathematical building blocks of neural networks"
     ]
   },
   {
-    "objectID": "05.html",
-    "href": "05.html",
-    "title": "5. Fundamentals of machine learning",
+    "objectID": "08.html",
+    "href": "08.html",
+    "title": "8. Image classification",
     "section": "",
-    "text": "Fundamentals of machine learning\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "Image classification\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "5. Fundamentals of machine learning"
+      "8. Image classification"
     ]
   },
   {
-    "objectID": "10.html",
-    "href": "10.html",
-    "title": "10. Interpreting what ConvNets learn",
+    "objectID": "12.html",
+    "href": "12.html",
+    "title": "12. Object detection",
     "section": "",
-    "text": "Interpreting what ConvNets learn\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "Object detection\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "10. Interpreting what ConvNets learn"
+      "12. Object detection"
     ]
   }
 ]
