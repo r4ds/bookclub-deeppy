@@ -1,0 +1,229 @@
+---
+title: Object detection
+---
+
+## Learning objectives
+
+-   Understand what object detection is about
+-   Compare two-stage and single-stage object detectors
+-   Describe how a YOLO-style detector represents boxes, classes, and confidence
+
+
+## Why this chapter matters
+
+- Image classification answers: **what is in the image?**
+- Object detection answers: **what is in the image, and where is it?**
+- Detection is often enough for counting, tracking, cropping, and routing images to other systems
+- It is cheaper to label and usually faster to run than full image segmentation
+
+:::: notes
+Good opening question: when would a bounding box be enough, and when would you need a pixel-level mask?
+::::
+
+
+## Detection vs segmentation
+
+| Task | Output | Cost profile |
+|:--|:--|:--|
+| Classification | One or more image-level labels | Cheapest labels and fastest inference |
+| Object detection | Labels plus bounding boxes | Moderate labeling cost; fast enough for many real-time uses |
+| Segmentation | Labels plus pixel-level masks | Most detailed, but expensive to label and compute |
+
+
+## What a detector predicts
+
+For each detected object, the model needs three things:
+
+1. **Class label**: what kind of object is this?
+2. **Bounding box**: where is it?
+3. **Confidence score**: how sure is the model?
+
+![Object detectors draw boxes around objects in an image and label them (Figure 12.1).](images/ch12-fig12-01-object-detection.png){fig-align="center" height="300" fig-alt="Photo of a street scene with bounding boxes around detected objects such as people, cars, and traffic lights."}
+
+:::: notes
+The confidence score is not just a convenience for display. It is what lets us filter predictions, tune precision/recall tradeoffs, and decide whether downstream code should trust a detection.
+::::
+
+
+## Two broad families
+
+| Detector family | Basic idea | Tradeoff |
+|:--|:--|:--|
+| Two-stage detectors, such as R-CNN | First propose object-like regions, then classify each region | Accurate, but computationally expensive |
+| Single-stage detectors, such as YOLO, SSD, RetinaNet | Predict boxes and labels in one pass | Faster and more practical for real-time use |
+
+
+## Two-stage R-CNN intuition
+
+The pipeline:
+
+1. Generate thousands of **region proposals**
+2. Classify each proposal with a ConvNet
+3. Discard low-scoring proposals
+4. Refine boxes and remove duplicates
+
+The cost is that the model must reason over many candidate patches for every image.
+
+
+## Single-stage detectors
+
+- A single model predicts both **where** objects are and **what** they are
+- YOLO stands for **You Only Look Once**
+- The chapter builds a simplified version of the original 2015 YOLO model
+- Modern YOLO and RetinaNet variants are more complex, but the core representation is similar
+
+:::: notes
+The important mental shift: detection becomes a dense prediction problem over image regions, not a separate crop-and-classify loop.
+::::
+
+
+## YOLO in one picture
+
+![YOLO outputs as visualized in the first YOLO paper (Figure 12.4).](images/ch12-fig12-04-yolo-diagram.png){fig-align="center" height="500" fig-alt="Diagram showing a YOLO-style object detector splitting an image into a grid and predicting bounding boxes and class probabilities."}
+
+
+## The YOLO grid
+
+- Divide the image into a fixed grid, such as **6 x 6**
+- Each grid cell predicts:
+    - one bounding box in the chapter's simplified model
+    - one confidence score
+    - one class-probability vector
+- A cell is responsible for an object when the object's center falls inside that cell
+
+
+## The output tensor
+
+In the chapter's simplified YOLO model:
+
+- `grid_size = 6`
+- `num_labels = 91` for COCO classes
+- Each grid location outputs `91 + 5` numbers
+- The `5` box numbers are `(x, y, w, h, confidence)`
+- The final output shape is `6 x 6 x 96`
+
+:::: notes
+Useful check for the group: 6 * 6 * 96 = 3,456 output numbers per image.
+::::
+
+
+## Coordinate systems
+
+Bounding boxes move through several representations:
+
+| Representation | Meaning |
+|:--|:--|
+| COCO input box | `(x, y, width, height)` in pixels from the top-left corner |
+| Normalized box | Same idea, scaled into a `[0, 1]` unit square |
+| YOLO grid box | Center `(x, y)` relative to a grid cell, plus image-relative width and height |
+
+
+## Preparing COCO for YOLO
+
+- Load image metadata and annotations from COCO
+- Group boxes and labels by image
+- Normalize boxes so they are independent of image size
+- Build one class map and one box map per image
+- Mark grid cells with no object as confidence `0`
+
+:::: notes
+The chapter filters to images with four or fewer boxes to keep the example runnable. This is a teaching simplification, not a real production constraint.
+::::
+
+
+## Why object detection losses are different
+
+Classification loss is familiar:
+
+- compare predicted class probabilities to the true class label
+
+Box loss needs more structure:
+
+- reward accurate box location and size
+- ignore box-placement error for empty cells
+- train confidence to be low for empty cells
+- train confidence to reflect box quality when an object exists
+
+
+## Intersection over Union
+
+IoU measures how much two boxes overlap:
+
+$$
+\text{IoU} = \frac{\text{area of overlap}}{\text{area of union}}
+$$
+
+- `1.0` means perfect overlap
+- `0.0` means no overlap
+- In YOLO, IoU becomes the target for confidence when a grid cell contains an object
+
+
+## The YOLO box loss
+
+The chapter's custom loss combines:
+
+| Part | What it penalizes |
+|:--|:--|
+| `x, y` error | Box center in the grid cell |
+| `w, h` error | Box size |
+| confidence error | Whether an object exists and how good the predicted box is |
+
+The loss scales up box-placement errors and scales down confidence errors for empty cells.
+
+
+## Training from scratch is hard
+
+The chapter's simplified model is useful for learning, but not production-ready:
+
+- COCO is large, even when filtered
+- Training takes significant GPU time
+- The example is still undertrained after several epochs
+- Real detectors need stronger augmentation, more epochs, and more careful metrics
+- Modern detectors usually predict multiple boxes per location and use larger output grids
+
+
+## RetinaNet and pretrained detection
+
+- RetinaNet is also a single-stage detector
+- KerasHub provides a pretrained RetinaNet model trained on COCO
+- Its outputs are familiar: boxes, confidences, labels, and number of detections
+- In practice, starting from a pretrained detector is often more useful than training from scratch
+
+
+## The scale problem
+
+- Late ConvNet layers contain rich semantic features, but coarse spatial detail
+- Early ConvNet layers preserve fine spatial detail, but weaker semantic meaning
+- Object detection needs both:
+    - small objects need high-resolution features
+    - large objects need broader semantic context
+
+## Feature Pyramid Network solution
+
+- Upsample (Conv2DTranspose) semantic context
+- Connect laterally with the feature maps at same resolution.
+
+![A feature pyramid network creates semantically interesting feature maps at different scales (Figure 12.8).](images/ch12-fig12-08-feature-pyramid-network.png){fig-align="center" height="260" fig-alt="Diagram of a feature pyramid network combining high-level semantic features with earlier high-resolution feature maps through upsampling and lateral connections."}
+
+
+## Practical model choice
+
+| Situation | Likely choice |
+|:--|:--|
+| Need pixel-precise boundaries | Segmentation model |
+| Need boxes for many images quickly | Single-stage detector |
+| Need a teaching implementation | Simplified YOLO |
+| Need useful results soon | Pretrained RetinaNet or modern YOLO |
+
+
+## Takeaways
+
+- Object detection localizes objects with **boxes, labels, and confidence scores**
+- Single-stage detectors make detection a fast, dense prediction problem
+- YOLO teaches the core representation: **grid cells predict boxes and classes**
+- IoU connects localization quality to training and evaluation
+- Pretrained multi-scale detectors such as RetinaNet are usually the practical starting point
+
+:::: notes
+Good closing prompt: after chapters 8-12, the group has seen classification, interpretation, segmentation, and detection. Which vision task feels most useful for your work, and which feels hardest to evaluate?
+::::
