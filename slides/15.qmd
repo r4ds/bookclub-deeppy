@@ -88,15 +88,15 @@ The human-translator analogy is the whole motivation for the encoder: you read t
 ::::
 
 
-## Sequence-to-sequence learning
+## Sequence-to-sequence learning {.smaller}
 
 ![Encoder Decoder setup](images/ch15-fig15-01-seq2seq-overview.png){fig-align="center" height="440" fig-alt="Diagram showing an encoder turning a source sequence into a representation and a decoder predicting the target sequence one token at a time."}
 
-**Encoder** reads entire source; **decoder** generates from `[start]` to `[end]` {.smaller}
+**Encoder** reads entire source; **decoder** generates from `[start]` to `[end]`
 
 
 
-## Encoder–decoder RNN
+## Encoder–decoder RNN {.smaller}
 
 ![A sequence-to-sequence RNN: bidirectional encoder, unidirectional decoder (Figure 15.2).](images/ch15-fig15-02-seq2seq-rnn.png){fig-align="center" height="300" fig-alt="Diagram of a bidirectional GRU encoder feeding its state into a unidirectional GRU decoder for translation."}
 
@@ -130,9 +130,9 @@ The human-translator analogy is the whole motivation for the encoder: you read t
 - RNNs pass all information through a **sequential loop** — like reading a book once and implementing from memory
 - Attention lets the model **look back** at any position in the source, weighted by relevance
 - Developed to help RNNs with long-range dependencies; then researchers asked: **attention only?**
+- Answer: Attention is all you need! (https://arxiv.org/abs/1706.03762 - Vaswani et. al.)
 
-
-## Dot-product attention
+## Dot-product attention {.smaller}
 
 ![Attention scores form a matrix — each row is one target word (green) scoring every source word (Figure 15.5).](images/ch15-fig15-05-attention-scores.png){fig-align="center" height="300" fig-alt="A 2D matrix of attention scores; each row corresponds to a target word and shows how strongly it attends to each source word."}
 
@@ -141,7 +141,7 @@ The human-translator analogy is the whole motivation for the encoder: you read t
 - No learned parameters yet — just "what's relevant to what"
 
 
-## Query, key, value: attention as lookup
+## Query, key, value: attention as lookup {.smaller}
 
 ![Attention as database retrieval: a query is compared against keys; the match scores rank the values (Figure 15.6).](images/ch15-fig15-06-query-key-value.png){fig-align="center" height="280" fig-alt="Diagram of a search/database lookup where a query is matched against keys and the scores are used to retrieve weighted values."}
 
@@ -155,8 +155,6 @@ This analogy is the unlock for the whole chapter. A web search: your query is ma
 
 
 ## Multi-head attention
-
-![Multi-headed attention: each head can focus on different source relationships (Figure 15.7).](images/ch15-fig15-07-multi-head-attention.png){fig-align="center" height="300" fig-alt="Diagram showing multiple attention heads each producing different weighted combinations of source tokens."}
 
 - Run several attention "heads" in parallel, each with its **own** Q/K/V projections
 - Each head can specialize — one tracks subject–verb, another tracks adjacent words
@@ -185,7 +183,7 @@ Discussion: why split into multiple heads instead of one big softmax? A single a
 - Causal mask = lower-triangular: position *i* sees tokens 0…*i* only
 
 :::: notes
-Callback: this is the same trap as a bidirectional RNN language model — let a token see the future and you get 99% training accuracy but a model that can't actually generate (the metric looks great; the task is broken). The causal mask is what prevents it. A useful reminder that high accuracy can mean you've leaked the label.
+Causal mask has the same motivation as not using a bidirectional RNN language model - discuss?
 ::::
 
 
@@ -198,7 +196,7 @@ Walk the group through this diagram slowly — it ties the section together. Tra
 ::::
 
 
-## First Transformer attempt: missing position
+## First Transformer attempt 
 
 - Replacing GRUs with `TransformerEncoder` + `TransformerDecoder` → only ~58% accuracy
 - **Problem**: attention is a **set** operation — permute token order, get the same result
@@ -219,17 +217,14 @@ Key aha of the section: attention sees a **set**, not a sequence — "dog bites 
 - Subjective translation quality is noticeably better
 
 
-
-
-## Pretrained Transformers: BERT and RoBERTa
+## Pretrained Transformers
 
 | Model | Idea |
-|:--|:--|
+|:--|:---------------------|
 | BERT | Masked language modeling — predict masked tokens from **surrounding** context |
 | RoBERTa | Same encoder architecture; **more pretraining data** (160 GB vs 16 GB) |
 
 - **Encoder-only**, bidirectional — great for representations, not autoregressive generation
-- Pretraining cost: RoBERTa estimated at **hundreds of thousands of dollars**
 - Shift in NLP: train huge models once, **fine-tune** on small labeled tasks
 
 
@@ -248,15 +243,11 @@ Key aha of the section: attention sees a **set**, not a sequence — "dog bites 
 | Spanish Transformer (with positional embeddings) | ~6 min | ~6 ms/step |
 | IMDb RoBERTa fine-tuning (transfer learning) | ~6 min | ~254 ms/step |
 
-- Transformer translation on A10G: ~**15× faster per step** than RNN on Colab T4 (6 ms vs 90 ms)
-- IMDb fine-tuning is fewer steps but heavier per step (124M-param backbone, 512-token sequences)
- 
 
 
 ## What makes the Transformer effective?
 
 - Connection to **Word2Vec**: tokens that co-occur end up **close** in embedding space
-- Like Hebb's rule — *"neurons that fire together wire together"* — correlation becomes geometry
 - Small models learn vector **arithmetic** (`king - man + woman ≈ queen`); large ones learn vector **programs**
 - Embedding spaces are **semantically continuous** and **interpolative**
 - Interpolation enables generalization — and **hallucination**
@@ -265,16 +256,6 @@ Key aha of the section: attention sees a **set**, not a sequence — "dog bites 
 The richest discussion in the chapter: a Transformer is an *interpolative* database. It can retrieve and blend beyond what it literally stored — that's both generalization and hallucination, two faces of the same mechanism. Prompt: if interpolation is the source of both, can you ever fully remove hallucination without losing generalization?
 ::::
 
-
-## Practical model choice
-
-| Situation | Likely approach |
-|:--|:--|
-| Toy text generation / learning | Char- or word-level LM with GRU |
-| Custom translation (small data) | Transformer seq2seq + positional embeddings |
-| Real translation / QA at scale | Pretrained seq2seq or LLM |
-| Classification with limited labels | Pretrained encoder (RoBERTa, BERT) + fine-tune |
-| Cutting-edge generation | Large causal LM (chapter 16) |
 
 
 ## Takeaways
