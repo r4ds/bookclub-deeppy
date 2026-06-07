@@ -22,6 +22,8 @@ Opening question: where in your own work is the desired output a **sequence** (t
 ::::
 
 
+# The Language Model
+
 ## From classification to generation
 
 | Task | Output |
@@ -69,6 +71,8 @@ The same weights, two very different runtimes:
 The interesting bit isn't the layer config — it's *why* generation can't reuse the training model as-is. Training sees whole sequences at once; generation has to carry state forward one step at a time. Also worth flagging: the chapter always picks the single highest-probability token (greedy `argmax`) — no temperature, sampling, or beam search. That's a natural lead-in to the sampling strategies in Chapter 16.
 ::::
 
+
+# Sequence-to-Sequence Learning
 
 ## English-to-Spanish translation data
 
@@ -125,6 +129,8 @@ The human-translator analogy is the whole motivation for the encoder: you read t
  
 
 
+# The Transformer
+
 ## What is attention?
 
 - RNNs pass all information through a **sequential loop** — like reading a book once and recalling it from memory
@@ -154,7 +160,9 @@ This analogy is the unlock for the whole chapter. A web search: your query is ma
 ::::
 
 
-## Multi-head attention
+## Multi-head attention {.smaller}
+
+![Each head attends in its own subspace; the heads are then concatenated (Figure 15.7).](images/ch15-fig15-07-multi-head-attention.png){fig-align="center" height="200" fig-alt="Diagram showing multiple attention heads each producing different weighted combinations of source tokens, concatenated into the output."}
 
 - Run several attention "heads" in parallel, each with its **own** Q/K/V projections
 - Each head can specialize — one tracks subject–verb, another tracks adjacent words
@@ -217,7 +225,30 @@ Key aha of the section: attention sees a **set**, not a sequence — "dog bites 
 - Subjective translation quality is noticeably better
 
 
-## Pretrained Transformers
+## Sample translations {.smaller}
+
+Real test-set outputs (`[start]`/`[end]` stripped):
+
+**RNN seq2seq**
+
+- *I think they're happy.* → "yo creo que son felices" ✓
+- *I will tell you tomorrow.* → "te lo voy mañana a decir" (right words, scrambled order)
+- *The prisoner was set free yesterday.* → "el plan fue ayer a un atasco" ✗
+
+**Transformer** (my training run)
+
+- *How far are you going?* → "qué tan lejos vas" ✓
+- *Lie still.* → "mantenete quieto" ✓ (idiomatic)
+- *The museum is open to the public.* → "el museo está abierto el museo" ✗ (loops, drops "to the public")
+
+:::: notes
+Both models handle short, common sentences well and stumble on longer ones — and the failures are *confidently* wrong, not blank (here the Transformer loops "el museo" and drops half the sentence). That's why next-token accuracy (65–67%) is a poor proxy for quality, and real MT uses BLEU. Prompt: which failure is worse — the RNN's scrambled word order, or the Transformer looping and dropping content?
+::::
+
+
+# Pretrained Transformers
+
+## BERT and RoBERTa
 
 | Model | Idea |
 |:--|:---------------------|
