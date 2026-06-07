@@ -260,12 +260,11 @@ The richest discussion in the chapter: a Transformer is an *interpolative* datab
 
 ## Takeaways
 
-- Language models learn **p(token | past tokens)**; generation is an inference-time loop
+- Language models learn **p(token | past tokens)**
 - Seq2seq = **encoder** (source) + **decoder** (autoregressive target)
 - **Attention** replaces RNN state loops with direct, context-dependent lookups
-- Transformers need **positional embeddings** and **causal masking** in the decoder
 - Pretrained Transformers + fine-tuning is the default for real NLP work
-- Hardware matters: parallel attention rewards modern GPUs; RNN translation can be painfully slow
+- Hardware matters: parallel attention takes full advantage of modern GPUs 
 
 :::: notes
 Good closing prompt: after chapters 14–15, you can classify text, generate Shakespeare, translate sentences, and fine-tune RoBERTa. Which of these feels closest to something you would use at work?

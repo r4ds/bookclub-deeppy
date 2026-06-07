@@ -11,6 +11,12 @@ $highlight-font-color: #A0E9FF;
 
 /*-- scss:rules --*/
 
+/*-- Prevent orphan words (lone last word on its own line) in body text --*/
+.reveal p,
+.reveal li {
+  text-wrap: pretty;
+}
+
 .reveal .footer {
   font-size: .6em !important;
 }
