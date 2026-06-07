@@ -109,7 +109,7 @@ title: Language models and the Transformer
 - Google Translate circa 2017 used a **stack of 7 LSTMs** in a similar setup
 
 
-## Book club timing: Colab T4 (cheapest tier)
+## Timing: Colab T4 (cheapest tier)
 
 | Example | Total time | Per step |
 |:--|:--|:--|
@@ -119,9 +119,7 @@ title: Language models and the Transformer
 - Shakespeare is small (~4M params, char-level, short sequences) — trains fast even on a T4
 - RNN translation is ~35M params with bidirectional encoding — noticeably slower per epoch
 
-:::: notes
-Good discussion point: why is translation slower per step despite similar ms/step numbers? Batch size, sequence handling, and model size all matter. Total wall time also depends on epochs/steps per epoch.
-::::
+ 
 
 
 ## What is attention?
@@ -190,19 +188,6 @@ Good discussion point: why is translation slower per step despite similar ms/ste
 - Subjective translation quality is noticeably better
 
 
-## Book club timing: Modal A10G (32 GB, 2 cores)
-
-| Example | Total time | Per step |
-|:--|:--|:--|
-| Spanish Transformer (with positional embeddings) | ~6 min | ~6 ms/step |
-| IMDb RoBERTa fine-tuning (transfer learning) | ~6 min | ~254 ms/step |
-
-- Transformer translation on A10G: ~**15× faster per step** than RNN on Colab T4 (6 ms vs 90 ms)
-- IMDb fine-tuning is fewer steps but heavier per step (124M-param backbone, 512-token sequences)
-
-:::: notes
-Worth noting: comparing across hardware (T4 vs A10G) is not apples-to-apples. The chapter also reports Transformers train ~3× faster per epoch than RNNs on the same hardware.
-::::
 
 
 ## Pretrained Transformers: BERT and RoBERTa
@@ -224,6 +209,17 @@ Worth noting: comparing across hardware (T4 vs A10G) is not apples-to-apples. Th
 - Backbone: 12 stacked Transformer encoder layers, **124M parameters**, 768-dim outputs
 - Classification head: use **first token** representation (`x[:, 0, :]`) → dense → sigmoid
 - One epoch fine-tuning → **~94%** test accuracy (vs ~90% ceiling in chapter 14)
+
+##   Timing: Modal A10G (32 GB, 2 cores)
+
+| Example | Total time | Per step |
+|:--|:--|:--|
+| Spanish Transformer (with positional embeddings) | ~6 min | ~6 ms/step |
+| IMDb RoBERTa fine-tuning (transfer learning) | ~6 min | ~254 ms/step |
+
+- Transformer translation on A10G: ~**15× faster per step** than RNN on Colab T4 (6 ms vs 90 ms)
+- IMDb fine-tuning is fewer steps but heavier per step (124M-param backbone, 512-token sequences)
+ 
 
 
 ## What makes the Transformer effective?
