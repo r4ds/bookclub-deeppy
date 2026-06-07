@@ -73,7 +73,7 @@ The interesting bit isn't the layer config — it's *why* generation can't reuse
 ## English-to-Spanish translation data
 
 - New task: map a **source** sequence to a **target** sequence (English → Spanish)
-- Training Data: ~118k English–Spanish sentence pairs; separate vectorizers per language
+- Training data: ~118k English–Spanish sentence pairs; separate vectorizers per language
 - Padding detail: `sample_weights` mask padded positions so padding doesn't pollute the loss
 
 
@@ -90,9 +90,9 @@ The human-translator analogy is the whole motivation for the encoder: you read t
 
 ## Sequence-to-sequence learning {.smaller}
 
-![Encoder Decoder setup](images/ch15-fig15-01-seq2seq-overview.png){fig-align="center" height="440" fig-alt="Diagram showing an encoder turning a source sequence into a representation and a decoder predicting the target sequence one token at a time."}
+![Encoder–decoder setup](images/ch15-fig15-01-seq2seq-overview.png){fig-align="center" height="440" fig-alt="Diagram showing an encoder turning a source sequence into a representation and a decoder predicting the target sequence one token at a time."}
 
-**Encoder** reads entire source; **decoder** generates from `[start]` to `[end]`
+**Encoder** reads the entire source; **decoder** generates from `[start]` to `[end]`
 
 
 
@@ -127,10 +127,10 @@ The human-translator analogy is the whole motivation for the encoder: you read t
 
 ## What is attention?
 
-- RNNs pass all information through a **sequential loop** — like reading a book once and implementing from memory
+- RNNs pass all information through a **sequential loop** — like reading a book once and recalling it from memory
 - Attention lets the model **look back** at any position in the source, weighted by relevance
 - Developed to help RNNs with long-range dependencies; then researchers asked: **attention only?**
-- Answer: Attention is all you need! (https://arxiv.org/abs/1706.03762 - Vaswani et. al.)
+- Answer: Attention is all you need! ([Vaswani et al., 2017](https://arxiv.org/abs/1706.03762))
 
 ## Dot-product attention {.smaller}
 
@@ -158,7 +158,7 @@ This analogy is the unlock for the whole chapter. A web search: your query is ma
 
 - Run several attention "heads" in parallel, each with its **own** Q/K/V projections
 - Each head can specialize — one tracks subject–verb, another tracks adjacent words
-- Scale scores by `sqrt(head_dim)` for stable softmax gradients
+- Scale scores by `1/sqrt(head_dim)` for stable softmax gradients
 - Keras: `layers.MultiHeadAttention(num_heads, head_dim)`
 
 :::: notes
@@ -169,7 +169,7 @@ Discussion: why split into multiple heads instead of one big softmax? A single a
 ## Transformer encoder block
 
 - **Self-attention** on the source sequence (each token attends to all tokens)
-- **Feedforward** sublayer: two `Dense` layers with ReLU — adds nonlinearity attention alone lacks
+- **Feedforward** sublayer: two `Dense` layers with ReLU — adds nonlinearity that attention alone lacks
 - **Residual connections** + **LayerNormalization** after each sublayer
 - `LayerNormalization` pools over features **within each sequence** (not across the batch like `BatchNorm`)
 - `attention_mask` excludes padding tokens
@@ -183,7 +183,7 @@ Discussion: why split into multiple heads instead of one big softmax? A single a
 - Causal mask = lower-triangular: position *i* sees tokens 0…*i* only
 
 :::: notes
-Causal mask has the same motivation as not using a bidirectional RNN language model - discuss?
+The causal mask has the same motivation as not using a bidirectional RNN for language modeling — discuss?
 ::::
 
 
@@ -196,7 +196,7 @@ Walk the group through this diagram slowly — it ties the section together. Tra
 ::::
 
 
-## First Transformer attempt 
+## First Transformer attempt
 
 - Replacing GRUs with `TransformerEncoder` + `TransformerDecoder` → only ~58% accuracy
 - **Problem**: attention is a **set** operation — permute token order, get the same result
@@ -211,7 +211,7 @@ Key aha of the section: attention sees a **set**, not a sequence — "dog bites 
 ## Transformer with positional embeddings
 
 - `PositionalEmbedding`: token embedding + position embedding (learned)
-- ~14M parameters (about **half** the RNN model)
+- ~14M parameters (under **half** the RNN model)
 - ~67% next-token accuracy after 30 epochs — beats the GRU
 - Training is **faster per epoch** — no sequential RNN loop; attention is parallel on GPU/TPU
 - Subjective translation quality is noticeably better
@@ -264,7 +264,7 @@ The richest discussion in the chapter: a Transformer is an *interpolative* datab
 - Seq2seq = **encoder** (source) + **decoder** (autoregressive target)
 - **Attention** replaces RNN state loops with direct, context-dependent lookups
 - Pretrained Transformers + fine-tuning is the default for real NLP work
-- Hardware matters: parallel attention takes full advantage of modern GPUs 
+- Hardware matters: parallel attention takes full advantage of modern GPUs
 
 :::: notes
 Good closing prompt: after chapters 14–15, you can classify text, generate Shakespeare, translate sentences, and fine-tune RoBERTa. Which of these feels closest to something you would use at work?
