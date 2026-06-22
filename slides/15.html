@@ -9,7 +9,7 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.9.38">
 
-  <title>Deep Learning with Python (3e) Book Club – Object detection</title>
+  <title>Deep Learning with Python (3e) Book Club – Language models and the Transformer</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -129,7 +129,7 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Object detection</h1>
+  <h1 class="title">Language models and the Transformer</h1>
 
 <div class="quarto-title-authors">
 </div>
@@ -138,21 +138,22 @@
 <section id="learning-objectives" class="slide level2">
 <h2>Learning objectives</h2>
 <ul>
-<li>Understand what object detection is about</li>
-<li>Compare two-stage and single-stage object detectors</li>
-<li>Describe how a YOLO-style detector represents boxes, classes, and confidence</li>
+<li>Explain what a language model predicts and how autoregressive generation works</li>
+<li>Describe the encoder–decoder setup for sequence-to-sequence problems like translation</li>
+<li>Explain attention (query, key, value) and why Transformers replace RNN loops</li>
+<li>Understand positional embeddings, causal masking, and pretrained Transformer fine-tuning</li>
 </ul>
 </section>
 <section id="why-this-chapter-matters" class="slide level2">
 <h2>Why this chapter matters</h2>
 <ul>
-<li>Image classification answers: <strong>what is in the image?</strong></li>
-<li>Object detection answers: <strong>what is in the image, and where is it?</strong></li>
-<li>Detection is often enough for counting, tracking, cropping, and routing images to other systems</li>
-<li>It is cheaper to label and usually faster to run than full image segmentation</li>
+<li>Chapter 14 handled <strong>text in</strong> (tokenization, embeddings, classification)</li>
+<li>Chapter 15 handles <strong>text out</strong> — generation, translation, and the architecture behind modern LLMs</li>
+<li>The Transformer is the backbone of ChatGPT, BERT, RoBERTa, and most NLP since 2017</li>
+<li>This chapter connects toy examples to <strong>pretrained models at scale</strong></li>
 </ul>
 <aside class="notes">
-<p>Good opening question: when would a bounding box be enough, and when would you need a pixel-level mask?</p>
+<p>Opening question: where in your own work is the desired output a <strong>sequence</strong> (text, code, a list of steps) rather than a single label? That is the jump this chapter makes.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -165,56 +166,41 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="detection-vs-segmentation" class="slide level2">
-<h2>Detection vs segmentation</h2>
+<section>
+<section id="the-language-model" class="title-slide slide level1 center">
+<h1>The Language Model</h1>
+
+</section>
+<section id="from-classification-to-generation" class="slide level2">
+<h2>From classification to generation</h2>
 <table class="caption-top">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">Task</th>
 <th style="text-align: left;">Output</th>
-<th style="text-align: left;">Cost profile</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Classification</td>
-<td style="text-align: left;">One or more image-level labels</td>
-<td style="text-align: left;">Cheapest labels and fastest inference</td>
+<td style="text-align: left;">Binary classification</td>
+<td style="text-align: left;">One number</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Object detection</td>
-<td style="text-align: left;">Labels plus bounding boxes</td>
-<td style="text-align: left;">Moderate labeling cost; fast enough for many real-time uses</td>
+<td style="text-align: left;">N-way classification</td>
+<td style="text-align: left;">N numbers</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Segmentation</td>
-<td style="text-align: left;">Labels plus pixel-level masks</td>
-<td style="text-align: left;">Most detailed, but expensive to label and compute</td>
+<td style="text-align: left;">Language modeling</td>
+<td style="text-align: left;">A <strong>sequence</strong> of tokens, one step at a time</td>
 </tr>
 </tbody>
 </table>
-</section>
-<section id="what-a-detector-predicts" class="slide level2">
-<h2>What a detector predicts</h2>
-<p>For each detected object, the model needs three things:</p>
-<ol type="1">
-<li><strong>Class label</strong>: what kind of object is this?</li>
-<li><strong>Bounding box</strong>: where is it?</li>
-<li><strong>Confidence score</strong>: how sure is the model?</li>
-</ol>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="images/ch12-fig12-01-object-detection.png" alt="Photo of a street scene with bounding boxes around detected objects such as people, cars, and traffic lights." height="300"></p>
-<figcaption>Object detectors draw boxes around objects in an image and label them (Figure 12.1).</figcaption>
-</figure>
-</div>
+<ul>
+<li>You cannot classify over all possible output sequences — the space is astronomically large</li>
+<li>Instead, learn <strong>p(token | past tokens)</strong> and generate by repeating that prediction</li>
+</ul>
 <aside class="notes">
-<p>The confidence score is not just a convenience for display. It is what lets us filter predictions, tune precision/recall tradeoffs, and decide whether downstream code should trust a detection.</p>
+<p>Check for the group: with a 20,000-word vocabulary, a 20-word sentence has 20,000²⁰ possible values. Factoring the problem into one-token-at-a-time predictions is what makes it tractable.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -227,8 +213,405 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="two-broad-families" class="slide level2">
-<h2>Two broad families</h2>
+<section id="the-language-model-setup" class="slide level2">
+<h2>The language model setup</h2>
+<ul>
+<li>Predict <strong>one token at a time</strong> from everything seen so far</li>
+<li>Vocabulary of 20,000 words → only 20,000 outputs per step</li>
+<li>Loop the model: predicted token becomes the next input (<strong>autoregressive</strong>)</li>
+<li>Training is still classification — but inference needs a <strong>custom generation loop</strong></li>
+</ul>
+</section>
+<section id="shakespeare-character-level-lm" class="slide level2">
+<h2>Shakespeare: character-level LM</h2>
+<ul>
+<li>Chunk the text into <strong>100-character</strong> sequences; labels are the input shifted by one</li>
+<li><strong>Character-level</strong> vocabulary → only <strong>67</strong> tokens (no tokenizer headaches)</li>
+<li>Simple model: <code>Embedding</code> → <code>GRU</code> → <code>Dense</code> softmax over characters</li>
+<li>Trains to ~70% next-char accuracy — enough to babble in Shakespearean style</li>
+</ul>
+</section>
+<section id="training-vs-generation" class="slide level2">
+<h2>Training vs generation</h2>
+<p>The same weights, two very different runtimes:</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Phase</th>
+<th style="text-align: left;">What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Training</td>
+<td style="text-align: left;">Fixed 100-token sequences; GRU state handled <strong>inside</strong> the layer</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Generation</td>
+<td style="text-align: left;">One character at a time; GRU state passed <strong>explicitly</strong> between calls</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Generation needs a separate model with <code>return_state=True</code>, primed on the prompt, then looped</li>
+</ul>
+<aside class="notes">
+<p>The interesting bit isn’t the layer config — it’s <em>why</em> generation can’t reuse the training model as-is. Training sees whole sequences at once; generation has to carry state forward one step at a time. Also worth flagging: the chapter always picks the single highest-probability token (greedy <code>argmax</code>) — no temperature, sampling, or beam search. That’s a natural lead-in to the sampling strategies in Chapter 16.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="sequence-to-sequence-learning" class="title-slide slide level1 center">
+<h1>Sequence-to-Sequence Learning</h1>
+
+</section>
+<section id="english-to-spanish-translation-data" class="slide level2">
+<h2>English-to-Spanish translation data</h2>
+<ul>
+<li>New task: map a <strong>source</strong> sequence to a <strong>target</strong> sequence (English → Spanish)</li>
+<li>Training data: ~118k English–Spanish sentence pairs; separate vectorizers per language</li>
+<li>Padding detail: <code>sample_weights</code> mask padded positions so padding doesn’t pollute the loss</li>
+</ul>
+</section>
+<section id="naive-rnn-translation-fails" class="slide level2">
+<h2>Naive RNN translation fails</h2>
+<ul>
+<li>Predicting target token N from only source tokens 0…N cannot work</li>
+<li>Spanish word order often depends on <strong>end</strong> of the English sentence</li>
+<li>Human translators read the <strong>whole</strong> source sentence first</li>
+</ul>
+<aside class="notes">
+<p>The human-translator analogy is the whole motivation for the encoder: you read the entire source before you start writing the target. Ask the group for a sentence where you genuinely can’t translate the first word until you’ve seen the last one.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="sequence-to-sequence-learning-1" class="slide level2 smaller">
+<h2>Sequence-to-sequence learning</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/ch15-fig15-01-seq2seq-overview.png" alt="Diagram showing an encoder turning a source sequence into a representation and a decoder predicting the target sequence one token at a time." height="440"></p>
+<figcaption>Encoder–decoder setup</figcaption>
+</figure>
+</div>
+<p><strong>Encoder</strong> reads the entire source; <strong>decoder</strong> generates from <code>[start]</code> to <code>[end]</code></p>
+</section>
+<section id="encoderdecoder-rnn" class="slide level2 smaller">
+<h2>Encoder–decoder RNN</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/ch15-fig15-02-seq2seq-rnn.png" alt="Diagram of a bidirectional GRU encoder feeding its state into a unidirectional GRU decoder for translation." height="300"></p>
+<figcaption>A sequence-to-sequence RNN: bidirectional encoder, unidirectional decoder (Figure 15.2).</figcaption>
+</figure>
+</div>
+<ul>
+<li><strong>Encoder</strong>: <code>Bidirectional(GRU)</code> — rich source representation</li>
+<li><strong>Decoder</strong>: unidirectional <code>GRU</code> with <code>initial_state=encoder_output</code></li>
+<li>~35M parameters; ~65% next-token accuracy on validation after 15 epochs</li>
+</ul>
+</section>
+<section id="rnn-seq2seq-limitations" class="slide level2">
+<h2>RNN seq2seq limitations</h2>
+<ul>
+<li>Entire source must fit in one <strong>fixed-size state vector</strong></li>
+<li>Long sequences: RNNs <strong>forget</strong> early tokens</li>
+<li>Inference is inefficient — reprocesses full source and target each step</li>
+<li>Google Translate circa 2017 used a <strong>stack of 7 LSTMs</strong> in a similar setup</li>
+</ul>
+</section>
+<section id="timing-colab-t4-cheapest-tier" class="slide level2">
+<h2>Timing: Colab T4 (cheapest tier)</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Example</th>
+<th style="text-align: left;">Total time</th>
+<th style="text-align: left;">Per step</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Shakespeare char LM</td>
+<td style="text-align: left;">~4 min</td>
+<td style="text-align: left;">~80 ms/step</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Spanish RNN translation</td>
+<td style="text-align: left;">~28 min</td>
+<td style="text-align: left;">~90 ms/step</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Shakespeare is small (~4M params, char-level, short sequences) — trains fast even on a T4</li>
+<li>RNN translation is ~35M params with bidirectional encoding — noticeably slower per epoch</li>
+</ul>
+</section></section>
+<section>
+<section id="the-transformer" class="title-slide slide level1 center">
+<h1>The Transformer</h1>
+
+</section>
+<section id="what-is-attention" class="slide level2">
+<h2>What is attention?</h2>
+<ul>
+<li>RNNs pass all information through a <strong>sequential loop</strong> — like reading a book once and recalling it from memory</li>
+<li>Attention lets the model <strong>look back</strong> at any position in the source, weighted by relevance</li>
+<li>Developed to help RNNs with long-range dependencies; then researchers asked: <strong>attention only?</strong></li>
+<li>Answer: Attention is all you need! (<a href="https://arxiv.org/abs/1706.03762">Vaswani et al., 2017</a>)</li>
+</ul>
+</section>
+<section id="dot-product-attention" class="slide level2 smaller">
+<h2>Dot-product attention</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/ch15-fig15-05-attention-scores.png" alt="A 2D matrix of attention scores; each row corresponds to a target word and shows how strongly it attends to each source word." height="300"></p>
+<figcaption>Attention scores form a matrix — each row is one target word (green) scoring every source word (Figure 15.5).</figcaption>
+</figure>
+</div>
+<ul>
+<li>Score each source position against the current target position, <code>softmax</code>, then take a <strong>weighted sum</strong> of source vectors</li>
+<li>Dot-product: vectors that are <strong>close</strong> in embedding space score higher</li>
+<li>No learned parameters yet — just “what’s relevant to what”</li>
+</ul>
+</section>
+<section id="query-key-value-attention-as-lookup" class="slide level2 smaller">
+<h2>Query, key, value: attention as lookup</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/ch15-fig15-06-query-key-value.png" alt="Diagram of a search/database lookup where a query is matched against keys and the scores are used to retrieve weighted values." height="280"></p>
+<figcaption>Attention as database retrieval: a query is compared against keys; the match scores rank the values (Figure 15.6).</figcaption>
+</figure>
+</div>
+<ul>
+<li>Borrowed from search engines: <strong>query</strong> = what you’re looking for, <strong>keys</strong> = what’s indexed, <strong>values</strong> = what you retrieve</li>
+<li>Dot-product(query, key) = a <strong>relevance score</strong>; softmax turns scores into retrieval weights</li>
+<li>Make Q, K, V each a learned <code>Dense</code> projection → attention becomes trainable</li>
+</ul>
+<aside class="notes">
+<p>This analogy is the unlock for the whole chapter. A web search: your query is matched against indexed keys, and the best-matching pages (values) come back ranked. Self-attention is the same lookup, run with every token as a query against every token as a key. Worth spending real discussion time here.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="multi-head-attention" class="slide level2 smaller">
+<h2>Multi-head attention</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/ch15-fig15-07-multi-head-attention.png" alt="Diagram showing multiple attention heads each producing different weighted combinations of source tokens, concatenated into the output." height="200"></p>
+<figcaption>Each head attends in its own subspace; the heads are then concatenated (Figure 15.7).</figcaption>
+</figure>
+</div>
+<ul>
+<li>Run several attention “heads” in parallel, each with its <strong>own</strong> Q/K/V projections</li>
+<li>Each head can specialize — one tracks subject–verb, another tracks adjacent words</li>
+<li>Scale scores by <code>1/sqrt(head_dim)</code> for stable softmax gradients</li>
+<li>Keras: <code>layers.MultiHeadAttention(num_heads, head_dim)</code></li>
+</ul>
+<aside class="notes">
+<p>Discussion: why split into multiple heads instead of one big softmax? A single attention pattern averages everything together and washes out individual relationships. Separate heads let the model attend to several kinds of relationship at once — the same reason a ConvNet uses many filters per layer.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="transformer-encoder-block" class="slide level2">
+<h2>Transformer encoder block</h2>
+<ul>
+<li><strong>Self-attention</strong> on the source sequence (each token attends to all tokens)</li>
+<li><strong>Feedforward</strong> sublayer: two <code>Dense</code> layers with ReLU — adds nonlinearity that attention alone lacks</li>
+<li><strong>Residual connections</strong> + <strong>LayerNormalization</strong> after each sublayer</li>
+<li><code>LayerNormalization</code> pools over features <strong>within each sequence</strong> (not across the batch like <code>BatchNorm</code>)</li>
+<li><code>attention_mask</code> excludes padding tokens</li>
+</ul>
+</section>
+<section id="transformer-decoder-block" class="slide level2">
+<h2>Transformer decoder block</h2>
+<ul>
+<li><strong>Self-attention</strong> with <strong>causal mask</strong> (<code>use_causal_mask=True</code>) — no peeking at future target tokens</li>
+<li><strong>Cross-attention</strong> — target queries attend to encoder keys/values</li>
+<li>Same feedforward + residual + layernorm pattern as the encoder</li>
+<li>Causal mask = lower-triangular: position <em>i</em> sees tokens 0…<em>i</em> only</li>
+</ul>
+<aside class="notes">
+<p>The causal mask has the same motivation as not using a bidirectional RNN for language modeling — discuss?</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="transformer-blocks-stacked" class="slide level2">
+<h2>Transformer blocks stacked</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/ch15-fig15-08-transformer-blocks.png" alt="Diagram of stacked self-attention, cross-attention, and feedforward sublayers in encoder and decoder blocks." height="360"></p>
+<figcaption>Transformer encoder and decoder block computations (Figure 15.8).</figcaption>
+</figure>
+</div>
+<aside class="notes">
+<p>Walk the group through this diagram slowly — it ties the section together. Trace one path: encoder self-attention → the decoder’s causal self-attention → cross-attention into the encoder output → feedforward. Note the three distinct places attention shows up.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="first-transformer-attempt" class="slide level2">
+<h2>First Transformer attempt</h2>
+<ul>
+<li>Replacing GRUs with <code>TransformerEncoder</code> + <code>TransformerDecoder</code> → only ~58% accuracy</li>
+<li><strong>Problem</strong>: attention is a <strong>set</strong> operation — permute token order, get the same result</li>
+<li>Without position info, the model is not truly sequence-aware</li>
+<li>Fix: add <strong>positional embeddings</strong> (learned position vectors added to token embeddings)</li>
+</ul>
+<aside class="notes">
+<p>Key aha of the section: attention sees a <strong>set</strong>, not a sequence — “dog bites man” and “man bites dog” look identical to it. Ask the group why an RNN never had this problem (it processes tokens in order) and what we give up to gain attention’s parallelism.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="transformer-with-positional-embeddings" class="slide level2">
+<h2>Transformer with positional embeddings</h2>
+<ul>
+<li><code>PositionalEmbedding</code>: token embedding + position embedding (learned)</li>
+<li>~14M parameters (under <strong>half</strong> the RNN model)</li>
+<li>~67% next-token accuracy after 30 epochs — beats the GRU</li>
+<li>Training is <strong>faster per epoch</strong> — no sequential RNN loop; attention is parallel on GPU/TPU</li>
+<li>Subjective translation quality is noticeably better</li>
+</ul>
+</section>
+<section id="sample-translations" class="slide level2 smaller">
+<h2>Sample translations</h2>
+<p>Real test-set outputs (<code>[start]</code>/<code>[end]</code> stripped):</p>
+<p><strong>RNN seq2seq</strong></p>
+<ul>
+<li><em>I think they’re happy.</em> → “yo creo que son felices” ✓</li>
+<li><em>I will tell you tomorrow.</em> → “te lo voy mañana a decir” (right words, scrambled order)</li>
+<li><em>The prisoner was set free yesterday.</em> → “el plan fue ayer a un atasco” ✗</li>
+</ul>
+<p><strong>Transformer</strong> (my training run)</p>
+<ul>
+<li><em>How far are you going?</em> → “qué tan lejos vas” ✓</li>
+<li><em>Lie still.</em> → “mantenete quieto” ✓ (idiomatic)</li>
+<li><em>The museum is open to the public.</em> → “el museo está abierto el museo” ✗ (loops, drops “to the public”)</li>
+</ul>
+<aside class="notes">
+<p>Both models handle short, common sentences well and stumble on longer ones — and the failures are <em>confidently</em> wrong, not blank (here the Transformer loops “el museo” and drops half the sentence). That’s why next-token accuracy (65–67%) is a poor proxy for quality, and real MT uses BLEU. Prompt: which failure is worse — the RNN’s scrambled word order, or the Transformer looping and dropping content?</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="pretrained-transformers" class="title-slide slide level1 center">
+<h1>Pretrained Transformers</h1>
+
+</section>
+<section id="bert-and-roberta" class="slide level2">
+<h2>BERT and RoBERTa</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 88%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Model</th>
+<th style="text-align: left;">Idea</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BERT</td>
+<td style="text-align: left;">Masked language modeling — predict masked tokens from <strong>surrounding</strong> context</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RoBERTa</td>
+<td style="text-align: left;">Same encoder architecture; <strong>more pretraining data</strong> (160 GB vs 16 GB)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Encoder-only</strong>, bidirectional — great for representations, not autoregressive generation</li>
+<li>Shift in NLP: train huge models once, <strong>fine-tune</strong> on small labeled tasks</li>
+</ul>
+</section>
+<section id="roberta-kerashub-on-imdb" class="slide level2">
+<h2>RoBERTa + KerasHub on IMDb</h2>
+<ul>
+<li><code>keras_hub</code>: <code>Tokenizer.from_preset("roberta_base_en")</code> + <code>Backbone.from_preset(...)</code></li>
+<li>Subword tokenizer (~50k vocab) — handles open vocabulary without huge embedding tables</li>
+<li>Backbone: 12 stacked Transformer encoder layers, <strong>124M parameters</strong>, 768-dim outputs</li>
+<li>Classification head: use <strong>first token</strong> representation (<code>x[:, 0, :]</code>) → dense → sigmoid</li>
+<li>One epoch fine-tuning → <strong>~94%</strong> test accuracy (vs ~90% ceiling in chapter 14)</li>
+</ul>
+</section>
+<section id="timing-modal-a10g-32-gb-2-cores" class="slide level2">
+<h2>Timing: Modal A10G (32 GB, 2 cores)</h2>
 <table class="caption-top">
 <colgroup>
 <col style="width: 33%">
@@ -237,46 +620,35 @@
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;">Detector family</th>
-<th style="text-align: left;">Basic idea</th>
-<th style="text-align: left;">Tradeoff</th>
+<th style="text-align: left;">Example</th>
+<th style="text-align: left;">Total time</th>
+<th style="text-align: left;">Per step</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Two-stage detectors, such as R-CNN</td>
-<td style="text-align: left;">First propose object-like regions, then classify each region</td>
-<td style="text-align: left;">Accurate, but computationally expensive</td>
+<td style="text-align: left;">Spanish Transformer (with positional embeddings)</td>
+<td style="text-align: left;">~6 min</td>
+<td style="text-align: left;">~6 ms/step</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Single-stage detectors, such as YOLO, SSD, RetinaNet</td>
-<td style="text-align: left;">Predict boxes and labels in one pass</td>
-<td style="text-align: left;">Faster and more practical for real-time use</td>
+<td style="text-align: left;">IMDb RoBERTa fine-tuning (transfer learning)</td>
+<td style="text-align: left;">~6 min</td>
+<td style="text-align: left;">~254 ms/step</td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="two-stage-r-cnn-intuition" class="slide level2">
-<h2>Two-stage R-CNN intuition</h2>
-<p>The pipeline:</p>
-<ol type="1">
-<li>Generate thousands of <strong>region proposals</strong></li>
-<li>Classify each proposal with a ConvNet</li>
-<li>Discard low-scoring proposals</li>
-<li>Refine boxes and remove duplicates</li>
-</ol>
-<p>The cost is that the model must reason over many candidate patches for every image.</p>
-</section>
-<section id="single-stage-detectors" class="slide level2">
-<h2>Single-stage detectors</h2>
+<section id="what-makes-the-transformer-effective" class="slide level2">
+<h2>What makes the Transformer effective?</h2>
 <ul>
-<li>A single model predicts both <strong>where</strong> objects are and <strong>what</strong> they are</li>
-<li>YOLO stands for <strong>You Only Look Once</strong></li>
-<li>The chapter builds a simplified version of the original 2015 YOLO model</li>
-<li>Modern YOLO and RetinaNet variants are more complex, but the core representation is similar</li>
+<li>Connection to <strong>Word2Vec</strong>: tokens that co-occur end up <strong>close</strong> in embedding space</li>
+<li>Small models learn vector <strong>arithmetic</strong> (<code>king - man + woman ≈ queen</code>); large ones learn vector <strong>programs</strong></li>
+<li>Embedding spaces are <strong>semantically continuous</strong> and <strong>interpolative</strong></li>
+<li>Interpolation enables generalization — and <strong>hallucination</strong></li>
 </ul>
 <aside class="notes">
-<p>The important mental shift: detection becomes a dense prediction problem over image regions, not a separate crop-and-classify loop.</p>
+<p>The richest discussion in the chapter: a Transformer is an <em>interpolative</em> database. It can retrieve and blend beyond what it literally stored — that’s both generalization and hallucination, two faces of the same mechanism. Prompt: if interpolation is the source of both, can you ever fully remove hallucination without losing generalization?</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -288,248 +660,18 @@
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
-</section>
-<section id="yolo-in-one-picture" class="slide level2">
-<h2>YOLO in one picture</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="images/ch12-fig12-04-yolo-diagram.png" alt="Diagram showing a YOLO-style object detector splitting an image into a grid and predicting bounding boxes and class probabilities." height="500"></p>
-<figcaption>YOLO outputs as visualized in the first YOLO paper (Figure 12.4).</figcaption>
-</figure>
-</div>
-</section>
-<section id="the-yolo-grid" class="slide level2">
-<h2>The YOLO grid</h2>
-<ul>
-<li>Divide the image into a fixed grid, such as <strong>6 x 6</strong></li>
-<li>Each grid cell predicts:
-<ul>
-<li>one bounding box in the chapter’s simplified model</li>
-<li>one confidence score</li>
-<li>one class-probability vector</li>
-</ul></li>
-<li>A cell is responsible for an object when the object’s center falls inside that cell</li>
-</ul>
-</section>
-<section id="the-output-tensor" class="slide level2">
-<h2>The output tensor</h2>
-<p>In the chapter’s simplified YOLO model:</p>
-<ul>
-<li><code>grid_size = 6</code></li>
-<li><code>num_labels = 91</code> for COCO classes</li>
-<li>Each grid location outputs <code>91 + 5</code> numbers</li>
-<li>The <code>5</code> box numbers are <code>(x, y, w, h, confidence)</code></li>
-<li>The final output shape is <code>6 x 6 x 96</code></li>
-</ul>
-<aside class="notes">
-<p>Useful check for the group: 6 * 6 * 96 = 3,456 output numbers per image.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="coordinate-systems" class="slide level2">
-<h2>Coordinate systems</h2>
-<p>Bounding boxes move through several representations:</p>
-<table class="caption-top">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Representation</th>
-<th style="text-align: left;">Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">COCO input box</td>
-<td style="text-align: left;"><code>(x, y, width, height)</code> in pixels from the top-left corner</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Normalized box</td>
-<td style="text-align: left;">Same idea, scaled into a <code>[0, 1]</code> unit square</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">YOLO grid box</td>
-<td style="text-align: left;">Center <code>(x, y)</code> relative to a grid cell, plus image-relative width and height</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="preparing-coco-for-yolo" class="slide level2">
-<h2>Preparing COCO for YOLO</h2>
-<ul>
-<li>Load image metadata and annotations from COCO</li>
-<li>Group boxes and labels by image</li>
-<li>Normalize boxes so they are independent of image size</li>
-<li>Build one class map and one box map per image</li>
-<li>Mark grid cells with no object as confidence <code>0</code></li>
-</ul>
-<aside class="notes">
-<p>The chapter filters to images with four or fewer boxes to keep the example runnable. This is a teaching simplification, not a real production constraint.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="why-object-detection-losses-are-different" class="slide level2">
-<h2>Why object detection losses are different</h2>
-<p>Classification loss is familiar:</p>
-<ul>
-<li>compare predicted class probabilities to the true class label</li>
-</ul>
-<p>Box loss needs more structure:</p>
-<ul>
-<li>reward accurate box location and size</li>
-<li>ignore box-placement error for empty cells</li>
-<li>train confidence to be low for empty cells</li>
-<li>train confidence to reflect box quality when an object exists</li>
-</ul>
-</section>
-<section id="intersection-over-union" class="slide level2">
-<h2>Intersection over Union</h2>
-<p>IoU measures how much two boxes overlap:</p>
-<p><span class="math display">\[
-\text{IoU} = \frac{\text{area of overlap}}{\text{area of union}}
-\]</span></p>
-<ul>
-<li><code>1.0</code> means perfect overlap</li>
-<li><code>0.0</code> means no overlap</li>
-<li>In YOLO, IoU becomes the target for confidence when a grid cell contains an object</li>
-</ul>
-</section>
-<section id="the-yolo-box-loss" class="slide level2">
-<h2>The YOLO box loss</h2>
-<p>The chapter’s custom loss combines:</p>
-<table class="caption-top">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Part</th>
-<th style="text-align: left;">What it penalizes</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;"><code>x, y</code> error</td>
-<td style="text-align: left;">Box center in the grid cell</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>w, h</code> error</td>
-<td style="text-align: left;">Box size</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">confidence error</td>
-<td style="text-align: left;">Whether an object exists and how good the predicted box is</td>
-</tr>
-</tbody>
-</table>
-<p>The loss scales up box-placement errors and scales down confidence errors for empty cells.</p>
-</section>
-<section id="training-from-scratch-is-hard" class="slide level2">
-<h2>Training from scratch is hard</h2>
-<p>The chapter’s simplified model is useful for learning, but not production-ready:</p>
-<ul>
-<li>COCO is large, even when filtered</li>
-<li>Training takes significant GPU time</li>
-<li>The example is still undertrained after several epochs</li>
-<li>Real detectors need stronger augmentation, more epochs, and more careful metrics</li>
-<li>Modern detectors usually predict multiple boxes per location and use larger output grids</li>
-</ul>
-</section>
-<section id="retinanet-and-pretrained-detection" class="slide level2">
-<h2>RetinaNet and pretrained detection</h2>
-<ul>
-<li>RetinaNet is also a single-stage detector</li>
-<li>KerasHub provides a pretrained RetinaNet model trained on COCO</li>
-<li>Its outputs are familiar: boxes, confidences, labels, and number of detections</li>
-<li>In practice, starting from a pretrained detector is often more useful than training from scratch</li>
-</ul>
-</section>
-<section id="the-scale-problem" class="slide level2">
-<h2>The scale problem</h2>
-<ul>
-<li>Late ConvNet layers contain rich semantic features, but coarse spatial detail</li>
-<li>Early ConvNet layers preserve fine spatial detail, but weaker semantic meaning</li>
-<li>Object detection needs both:
-<ul>
-<li>small objects need high-resolution features</li>
-<li>large objects need broader semantic context</li>
-</ul></li>
-</ul>
-</section>
-<section id="feature-pyramid-network-solution" class="slide level2">
-<h2>Feature Pyramid Network solution</h2>
-<ul>
-<li>Upsample (Conv2DTranspose) semantic context</li>
-<li>Connect laterally with the feature maps at same resolution.</li>
-</ul>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="images/ch12-fig12-08-feature-pyramid-network.png" alt="Diagram of a feature pyramid network combining high-level semantic features with earlier high-resolution feature maps through upsampling and lateral connections." height="260"></p>
-<figcaption>A feature pyramid network creates semantically interesting feature maps at different scales (Figure 12.8).</figcaption>
-</figure>
-</div>
-</section>
-<section id="practical-model-choice" class="slide level2">
-<h2>Practical model choice</h2>
-<table class="caption-top">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Situation</th>
-<th style="text-align: left;">Likely choice</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Need pixel-precise boundaries</td>
-<td style="text-align: left;">Segmentation model</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Need boxes for many images quickly</td>
-<td style="text-align: left;">Single-stage detector</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Need a teaching implementation</td>
-<td style="text-align: left;">Simplified YOLO</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Need useful results soon</td>
-<td style="text-align: left;">Pretrained RetinaNet or modern YOLO</td>
-</tr>
-</tbody>
-</table>
 </section>
 <section id="takeaways" class="slide level2">
 <h2>Takeaways</h2>
 <ul>
-<li>Object detection localizes objects with <strong>boxes, labels, and confidence scores</strong></li>
-<li>Single-stage detectors make detection a fast, dense prediction problem</li>
-<li>YOLO teaches the core representation: <strong>grid cells predict boxes and classes</strong></li>
-<li>IoU connects localization quality to training and evaluation</li>
-<li>Pretrained multi-scale detectors such as RetinaNet are usually the practical starting point</li>
+<li>Language models learn <strong>p(token | past tokens)</strong></li>
+<li>Seq2seq = <strong>encoder</strong> (source) + <strong>decoder</strong> (autoregressive target)</li>
+<li><strong>Attention</strong> replaces RNN state loops with direct, context-dependent lookups</li>
+<li>Pretrained Transformers + fine-tuning is the default for real NLP work</li>
+<li>Hardware matters: parallel attention takes full advantage of modern GPUs</li>
 </ul>
 <aside class="notes">
-<p>Good closing prompt: after chapters 8-12, the group has seen classification, interpretation, segmentation, and detection. Which vision task feels most useful for your work, and which feels hardest to evaluate?</p>
+<p>Good closing prompt: after chapters 14–15, you can classify text, generate Shakespeare, translate sentences, and fine-tune RoBERTa. Which of these feels closest to something you would use at work?</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -543,7 +685,7 @@
       }</style></aside>
 
 
-</section>
+</section></section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <div class="footer footer-default">
