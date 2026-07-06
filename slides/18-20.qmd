@@ -12,8 +12,8 @@ title: Best practices, the future of AI, and conclusions
 
 ## Wrapping up: three "big picture" chapters
 
-- **Chapter 18** — the engineering that turns a working model into a *real-world* one
-- **Chapter 19** — Chollet's argument for what deep learning is, isn't, and could become
+- **Chapter 18** — what is needed to scale a proof of concept to a real world model.
+- **Chapter 19** — Chollet's argument for what deep learning is and isn't
 - **Chapter 20** — a bird's-eye review of everything, and where to go next
 - Less code this week, more **discussion** — this is our last session
 
@@ -26,14 +26,14 @@ Opening prompt for the group: after 20 chapters, what's the one capability you'r
 
 ## Getting the most out of your models
 
-Two levers before you reach for more data or a bigger model:
+Scaling up:
 
-- **Hyperparameter tuning** — search the choices you'd otherwise guess
+- **Hyperparameter tuning** — systematic search
 - **Model ensembling** — combine diverse models into one better predictor
 
-Then two levers for *speed*:
+Speeding up:
 
-- **Scaling** across multiple devices
+- **Parallelize** across multiple devices
 - **Lower-precision** computation
 
 
@@ -42,13 +42,12 @@ Then two levers for *speed*:
 | | Set by | Example |
 |:--|:--|:--|
 | **Parameters** | Backpropagation | Layer weights |
-| **Hyperparameters** | You, before training | # units, # layers, learning rate |
+| **Hyperparameters** | Experience and/or search | # units, # layers, learning rate |
 
-- Hyperparameter space is **discrete and non-differentiable** — no gradient descent
+- Hyperparameter space is often **discrete and non-differentiable** — no gradient descent
 - Need gradient-free search: build → train → measure val → pick next → repeat
 
-
-## KerasTuner
+## KerasTuner {.smaller}
 
 - Replace hardcoded values with **ranges**:
   - `Int(name="units", min_value=16, max_value=64, step=16)`
@@ -58,9 +57,10 @@ Then two levers for *speed*:
 
 | Tuner | Idea |
 |:--|:--|
-| `RandomSearch` | Simple baseline |
-| `BayesianOptimization` | Learns from past trials |
-| `Hyperband` | Smart early-stopping schedule |
+| `GridSearch` | Systematic search |
+| `RandomSearch` |  Like it sounds... |
+| `BayesianOptimization` | Balance exploit vs explore |
+
 
 :::: notes
 The mechanics matter less than the mindset: tuning turns "I'll just pick 32 units" into a measured decision. `executions_per_trial` trains each config more than once to average out random-seed variance — worth mentioning why that's needed.
@@ -70,8 +70,7 @@ The mechanics matter less than the mindset: tuning turns "I'll just pick 32 unit
 ## The validation-set overfitting trap
 
 - Every time you tune on the validation set, you **leak** information about it
-- Hyperparameters start to overfit *that specific split*
-- Symptom: great val numbers, disappointing test numbers
+- Hyperparameters start to overfit the validation data...
 - Defense: keep the **test set** untouched until the very end
 
 :::: notes
@@ -79,21 +78,9 @@ This is the same leakage idea from Chapter 5, one level up. First we overfit tra
 ::::
 
 
-## Crafting effective search spaces
-
-- **Don't** turn every choice into a hyperparameter — the space grows exponentially
-- Automate the **micro-decisions** (unit counts, dropout rates)
-- Hand-pick the **macro-decisions** (residual connections, overall architecture) — these transfer across tasks
-- KerasTuner ships templates: `HyperXception`, `HyperResNet`
-
-:::: notes
-The judgment call: tuning is for things you genuinely don't have a prior on. If you already know residual connections help, don't spend your search budget rediscovering that.
-::::
-
-
 ## Model ensembling
 
-- Pool predictions from **multiple** models → better than any single one
+- Pool predictions from **multiple** models 
 - "Blind men and the elephant": different models capture different facets
 
 ```python
@@ -109,10 +96,8 @@ final_preds = 0.5*preds_a + 0.25*preds_b + 0.1*preds_c + 0.15*preds_d  # learned
 - Retraining the **same** net with new seeds → tiny gains
 - Mixing **fundamentally different** methods (trees + neural nets) → big gains
 - A weaker model with a *unique perspective* can still help the ensemble
-
-:::: notes
-2014 Higgs Boson challenge: a 4th-place entry combined tree models and deep nets; a regularized greedy forest that was individually weaker still boosted the ensemble because it was *wrong in different ways*. Discussion: this is why Kaggle winners are almost always ensembles — is that a strength of the method or a sign we don't have one model that's good enough?
-::::
+- Example: 2014 Higgs Boson challenge 4th place entry combined tree models and deep nets.
+ 
 
 
 ## Scaling up: data vs. model parallelism
@@ -123,28 +108,10 @@ final_preds = 0.5*preds_a + 0.25*preds_b + 0.1*preds_c + 0.15*preds_d  # learned
 | **Model parallelism** | The *model* | Model too big for one device |
 
 - Data parallel: replicate model, each device gets a sub-batch, **average gradients**
-- Model parallel: split layers (horizontal) or split within a layer (vertical, preferred)
-- You can **combine** both (e.g. split across 4 GPUs, replicate ×2 → 8 devices)
+- Model parallel: split layers or split within a layer 
+- Can **combine** both (e.g. split across 4 GPUs, replicate ×2 → 8 devices)
 
-
-## Multi-GPU and TPU in Keras
-
-- One line, before you build the model:
-
-```python
-keras.distribution.set_distribution(keras.distribution.DataParallel())
-```
-
-- **JAX** backend is the most performant/scalable for large runs
-- Realistic scaling (not linear): 2 GPUs ≈ 2×, 4 ≈ 3.8×, 8 ≈ 7.3×
-- **TPU v2** ≈ 15× a P100, ~3× more cost-effective; free tier on Colab
-- TPUs want **big batches** + `steps_per_execution=8` to fuse steps
-
-:::: notes
-Note the "loop of progress" framing: faster training isn't just cheaper — it lets you run more experiments, which is what actually improves the final model. Speed compounds.
-::::
-
-
+ 
 ## Lower-precision computation
 
 | Type | Bits | Resolution |
@@ -159,11 +126,7 @@ Note the "loop of progress" framing: faster training isn't just cheaper — it l
 
 
 ## Mixed precision & loss scaling
-
-```python
-keras.config.set_dtype_policy("mixed_float16")
-```
-
+ 
 - Compute in **float16**, store & update weights in **float32** — best of both
 - Each layer has a `compute_dtype` (float16) and `variable_dtype` (float32)
 - **Loss scaling**: multiply the loss so small gradients don't underflow to zero
@@ -194,7 +157,7 @@ This is the "make it real" section: mixed precision for training, int8 for servi
 
 - They freeze after training: a static chain of continuous geometric transforms
 - Brilliant *within* the training distribution; brittle *outside* it
-- The rest of the chapter is Chollet unpacking what that means
+- The rest of the chapter is Chollet's opinion on what that means.
 
 :::: notes
 Set expectations: this chapter is opinionated. Chollet is the author of Keras *and* the creator of the ARC benchmark — he has a specific thesis. Worth reading it as a strong argument to engage with, not settled fact. Where do people agree/disagree?
@@ -206,7 +169,7 @@ Set expectations: this chapter is opinionated. Chollet is the author of Keras *a
 - Parameters are frozen; a distribution shift has no recovery mechanism
 - LLMs **memorize** vector functions rather than learning in-context
 - "10 kg of steel vs 1 kg of feathers" — answered wrong by pattern-matching a *memorized* trick question
-- Maintenance is whack-a-mole: reportedly ~25,000 people patching individual failures
+- Maintenance is whack-a-mole
 
 
 ## Limitation 2 — sensitivity to phrasing
@@ -214,7 +177,7 @@ Set expectations: this chapter is opinionated. Chollet is the author of Keras *a
 - **Adversarial examples**: an imperceptible pixel change → panda classified as gibbon
 - LLMs: rename a variable or tweak a number and performance can **collapse**
 - The "Alice in Wonderland" riddle breaks when N and M drift from common values
-- This is what "prompt engineering" is really papering over
+- "prompt engineering": minor changes and tank performanece!
 
 :::: notes
 Reframe for discussion: "prompt engineering" is often sold as *your model is smarter than you know*. Chollet's read is the opposite — *there's a range of tiny changes that can tank performance, and you're searching to avoid them.* Which framing matches people's real experience?
@@ -231,7 +194,8 @@ Reframe for discussion: "prompt engineering" is often sold as *your model is sma
 
 - We project **theory of mind** onto anything that uses language
 - Models lack the sensorimotor grounding behind human understanding
-- > Never fall into the trap of believing that neural networks understand the task they perform.
+
+"Never fall into the trap of believing that neural networks understand the task they perform."
 
 
 ## Scale isn't all you need
@@ -289,10 +253,10 @@ Tie this back to Chapter 18's validation-overfitting trap and to Goodhart's law.
 ::::
 
 
-## ARC-AGI: a test you can't study for
+## ARC-AGI: a test you can't study for {.smaller}
 
-- Tasks designed to be **genuinely novel** — like Raven's matrices, but no practice set
-- Everyone starts from the same innate "Core Knowledge priors"
+![Arc-example](images/ch19_arc_example.png)
+- Tasks designed to be **genuinely novel**  
 - 2024 ARC Prize forced a shift: **"scale is all you need" → "we need on-the-fly recombination"**
 - Winners all used **test-time adaptation** (test-time training or search)
 - OpenAI o3: **76%** at \$200/task, up to **88%** at huge cost — but *efficiency* is the point
