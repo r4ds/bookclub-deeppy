@@ -332,6 +332,25 @@ Whether or not you buy the roadmap, notice it's *constructive* — it names spec
 ::::
 
 
+## Since the book: is the gap closing? {.smaller}
+
+**Agentic AI & reasoning models** (o-series, extended thinking, tool use, code execution)
+
+- Chain-of-thought is a form of **search**; tool/code calls borrow real **programs**
+- Looks like Chollet's "blend of geometric intuition + algorithmic modules"…
+- …but as **external scaffolding** around the same LLM core — not a *grown, learned* system
+
+**ARC-AGI keeps moving**
+
+- ARC-AGI-1 (2019) → cracked by o3 + test-time adaptation
+- ARC-AGI-2 (2025) → resists brute force; still hard for frontier models
+- ARC-AGI-3 (previewed 2025) → interactive, **agentic** tasks — planning over many steps
+
+:::: notes
+The payoff question for the group: does agentic AI *validate* Chollet — search and symbols really were the missing pieces, and bolting them on helps — or does it *dodge* him: still an interpolative core with hand-built scaffolding, so his "automaton, not agent" line hasn't budged? And is ARC's versioning "moving the goalposts," or proof that each version was gameable? Let people land their own verdict — this is the live edge of the book.
+::::
+
+
 # Chapter 20 · Conclusions
 
 ## The nested definitions
