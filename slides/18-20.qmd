@@ -255,7 +255,8 @@ Tie this back to Chapter 18's validation-overfitting trap and to Goodhart's law.
 
 ## ARC-AGI: a test you can't study for {.smaller}
 
-![Arc-example](images/ch19_arc_example.png)
+![Arc-example](images/ch19_arc_example.png){fig-align="center" width="50%"}
+
 - Tasks designed to be **genuinely novel**  
 - 2024 ARC Prize forced a shift: **"scale is all you need" → "we need on-the-fly recombination"**
 - Winners all used **test-time adaptation** (test-time training or search)
