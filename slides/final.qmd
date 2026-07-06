@@ -1,0 +1,422 @@
+---
+title: Final
+---
+
+## Learning objectives
+
+-   Tune hyperparameters and ensemble models to squeeze more out of what you build
+-   Scale training across GPUs/TPUs and use lower precision to train and serve faster
+-   Understand *why* deep learning is powerful — and where it fundamentally falls short
+-   Place deep learning on the spectrum of generalization, and see what a path to real intelligence might look like
+-   Leave with a map of the whole book: the workflow, the architectures, and how to keep learning
+
+## Wrapping up: three "big picture" chapters
+
+- **Chapter 18** — the engineering that turns a working model into a *real-world* one
+- **Chapter 19** — Chollet's argument for what deep learning is, isn't, and could become
+- **Chapter 20** — a bird's-eye review of everything, and where to go next
+- Less code this week, more **discussion** — this is our last session
+
+:::: notes
+Opening prompt for the group: after 20 chapters, what's the one capability you're most likely to actually use at work — and the one idea that most changed how you think about ML? We'll come back to this at the end.
+::::
+
+
+# Chapter 18 · Best Practices for the Real World
+
+## Getting the most out of your models
+
+Two levers before you reach for more data or a bigger model:
+
+- **Hyperparameter tuning** — search the choices you'd otherwise guess
+- **Model ensembling** — combine diverse models into one better predictor
+
+Then two levers for *speed*:
+
+- **Scaling** across multiple devices
+- **Lower-precision** computation
+
+
+## Parameters vs. hyperparameters
+
+| | Set by | Example |
+|:--|:--|:--|
+| **Parameters** | Backpropagation | Layer weights |
+| **Hyperparameters** | You, before training | # units, # layers, learning rate |
+
+- Hyperparameter space is **discrete and non-differentiable** — no gradient descent
+- Need gradient-free search: build → train → measure val → pick next → repeat
+
+
+## KerasTuner
+
+- Replace hardcoded values with **ranges**:
+  - `Int(name="units", min_value=16, max_value=64, step=16)`
+  - Also `Float`, `Boolean`, `Choice`
+- Wrap your model in a function taking `hp`, or subclass `HyperModel`
+- Pick a search strategy:
+
+| Tuner | Idea |
+|:--|:--|
+| `RandomSearch` | Simple baseline |
+| `BayesianOptimization` | Learns from past trials |
+| `Hyperband` | Smart early-stopping schedule |
+
+:::: notes
+The mechanics matter less than the mindset: tuning turns "I'll just pick 32 units" into a measured decision. `executions_per_trial` trains each config more than once to average out random-seed variance — worth mentioning why that's needed.
+::::
+
+
+## The validation-set overfitting trap
+
+- Every time you tune on the validation set, you **leak** information about it
+- Hyperparameters start to overfit *that specific split*
+- Symptom: great val numbers, disappointing test numbers
+- Defense: keep the **test set** untouched until the very end
+
+:::: notes
+This is the same leakage idea from Chapter 5, one level up. First we overfit training data with parameters; now we can overfit validation data with hyperparameters. Ask the group where else this "optimizing on your yardstick" pattern shows up (Goodhart's law — foreshadows the "shortcut rule" in Ch.19).
+::::
+
+
+## Crafting effective search spaces
+
+- **Don't** turn every choice into a hyperparameter — the space grows exponentially
+- Automate the **micro-decisions** (unit counts, dropout rates)
+- Hand-pick the **macro-decisions** (residual connections, overall architecture) — these transfer across tasks
+- KerasTuner ships templates: `HyperXception`, `HyperResNet`
+
+:::: notes
+The judgment call: tuning is for things you genuinely don't have a prior on. If you already know residual connections help, don't spend your search budget rediscovering that.
+::::
+
+
+## Model ensembling
+
+- Pool predictions from **multiple** models → better than any single one
+- "Blind men and the elephant": different models capture different facets
+
+```python
+final_preds = 0.25 * (preds_a + preds_b + preds_c + preds_d)   # equal
+final_preds = 0.5*preds_a + 0.25*preds_b + 0.1*preds_c + 0.15*preds_d  # learned weights
+```
+
+- Weights tuned on validation (random search / Nelder–Mead)
+
+
+## Diversity beats individual quality
+
+- Retraining the **same** net with new seeds → tiny gains
+- Mixing **fundamentally different** methods (trees + neural nets) → big gains
+- A weaker model with a *unique perspective* can still help the ensemble
+
+:::: notes
+2014 Higgs Boson challenge: a 4th-place entry combined tree models and deep nets; a regularized greedy forest that was individually weaker still boosted the ensemble because it was *wrong in different ways*. Discussion: this is why Kaggle winners are almost always ensembles — is that a strength of the method or a sign we don't have one model that's good enough?
+::::
+
+
+## Scaling up: data vs. model parallelism
+
+| Strategy | What's split | When |
+|:--|:--|:--|
+| **Data parallelism** | The *batch* | Model fits on one device (common case) |
+| **Model parallelism** | The *model* | Model too big for one device |
+
+- Data parallel: replicate model, each device gets a sub-batch, **average gradients**
+- Model parallel: split layers (horizontal) or split within a layer (vertical, preferred)
+- You can **combine** both (e.g. split across 4 GPUs, replicate ×2 → 8 devices)
+
+
+## Multi-GPU and TPU in Keras
+
+- One line, before you build the model:
+
+```python
+keras.distribution.set_distribution(keras.distribution.DataParallel())
+```
+
+- **JAX** backend is the most performant/scalable for large runs
+- Realistic scaling (not linear): 2 GPUs ≈ 2×, 4 ≈ 3.8×, 8 ≈ 7.3×
+- **TPU v2** ≈ 15× a P100, ~3× more cost-effective; free tier on Colab
+- TPUs want **big batches** + `steps_per_execution=8` to fuse steps
+
+:::: notes
+Note the "loop of progress" framing: faster training isn't just cheaper — it lets you run more experiments, which is what actually improves the final model. Speed compounds.
+::::
+
+
+## Lower-precision computation
+
+| Type | Bits | Resolution |
+|:--|:--|:--|
+| `float32` | 32 | ~1e-7 (the default) |
+| `float16` | 16 | ~1e-3 |
+| `bfloat16` | 16 | wider range, coarser |
+| `int8` | 8 | integer inference |
+
+- Modern GPUs/TPUs have **dedicated 16-bit hardware** → ~2× faster, half the memory
+- But pure float16 **can't** represent the tiny updates gradient descent needs
+
+
+## Mixed precision & loss scaling
+
+```python
+keras.config.set_dtype_policy("mixed_float16")
+```
+
+- Compute in **float16**, store & update weights in **float32** — best of both
+- Each layer has a `compute_dtype` (float16) and `variable_dtype` (float32)
+- **Loss scaling**: multiply the loss so small gradients don't underflow to zero
+  - `LossScaleOptimizer(...)` adjusts the factor automatically
+
+
+## Faster inference: int8 quantization
+
+```python
+model.quantize("int8")   # Dense, EinsumDense, Embedding
+```
+
+- Convert trained float32 weights → int8 for **deployment**
+- Scale into [-127, 127], integer matmul, unscale — only rounding error lost
+- Faster than even float16
+- (float8 exists too — but only pays off for 5B+ param models on H100s)
+
+:::: notes
+This is the "make it real" section: mixed precision for training, int8 for serving. Ask the group who has actually deployed a model and hit latency/cost walls — this is where these knobs earn their keep.
+::::
+
+
+# Chapter 19 · The Future of AI
+
+## The core claim
+
+> Deep learning models are **vast, interpolative databases of patterns** — not reasoning engines.
+
+- They freeze after training: a static chain of continuous geometric transforms
+- Brilliant *within* the training distribution; brittle *outside* it
+- The rest of the chapter is Chollet unpacking what that means
+
+:::: notes
+Set expectations: this chapter is opinionated. Chollet is the author of Keras *and* the creator of the ARC benchmark — he has a specific thesis. Worth reading it as a strong argument to engage with, not settled fact. Where do people agree/disagree?
+::::
+
+
+## Limitation 1 — struggle with novelty
+
+- Parameters are frozen; a distribution shift has no recovery mechanism
+- LLMs **memorize** vector functions rather than learning in-context
+- "10 kg of steel vs 1 kg of feathers" — answered wrong by pattern-matching a *memorized* trick question
+- Maintenance is whack-a-mole: reportedly ~25,000 people patching individual failures
+
+
+## Limitation 2 — sensitivity to phrasing
+
+- **Adversarial examples**: an imperceptible pixel change → panda classified as gibbon
+- LLMs: rename a variable or tweak a number and performance can **collapse**
+- The "Alice in Wonderland" riddle breaks when N and M drift from common values
+- This is what "prompt engineering" is really papering over
+
+:::: notes
+Reframe for discussion: "prompt engineering" is often sold as *your model is smarter than you know*. Chollet's read is the opposite — *there's a range of tiny changes that can tank performance, and you're searching to avoid them.* Which framing matches people's real experience?
+::::
+
+
+## Limitation 3 — can't learn general programs
+
+- ~70% accuracy on **digit addition** after millions of examples
+- Place-value logic is discrete; continuous geometric transforms are a poor fit
+- Most **programs** simply can't be expressed as a smooth manifold
+
+## The anthropomorphizing trap
+
+- We project **theory of mind** onto anything that uses language
+- Models lack the sensorimotor grounding behind human understanding
+- > Never fall into the trap of believing that neural networks understand the task they perform.
+
+
+## Scale isn't all you need
+
+- 2023 story: just scale up, and AGI *emerges*
+- Reality: the benchmarks are largely **memorization tests**
+- Since 2017, ~**50,000×** more scale moved 2019 ARC-AGI from **0% → ~10%**
+- Same architecture (Transformer curve-fitting) → same fundamental ceiling
+
+:::: notes
+The number to sit with: 50,000× scale for a ~10-point gain on a test of genuine novelty. Contrast with how fast scale improved *memorization* benchmarks. This is the empirical core of the "scale isn't enough" argument.
+::::
+
+
+## Local vs. extreme generalization
+
+| | Local generalization | Extreme generalization |
+|:--|:--|:--|
+| Who | Deep nets | Humans, advanced animals |
+| How | Interpolate on the data manifold | Abstraction & reasoning |
+| Handles | "Known unknowns" | "Unknown unknowns" |
+| Data need | Millions of examples | A handful |
+
+- Humans derive rocket equations; nets need millions of trials and thousands of crashes
+
+
+## What is intelligence *for*?
+
+> The ability to efficiently use the information at your disposal to produce successful behavior in the face of an **uncertain, ever-changing future**.
+
+- Brains started as **automatons** — reactive if/then programs (insect-like)
+- Intelligence evolved to generate behavior **on the fly** for novel situations
+- Deep nets are sophisticated automatons → **cognitive automation**, not autonomy
+
+:::: notes
+The provocation: calling today's systems "artificial intelligence" is, for Chollet, a *category error* — they're automation. Is that a useful distinction, or moving the goalposts? Good place to let the group push back.
+::::
+
+
+## The kaleidoscope hypothesis
+
+- The world's infinite variety = recombination of a few **"atoms of meaning"**
+- Intelligence = **acquire** compact reusable abstractions + **recombine** them for novelty
+- Efficiency is the whole game: *how good are the abstractions you extract from limited experience?*
+
+## Setting the wrong target
+
+- **The shortcut rule**: optimize one metric → everything not measured gets ignored
+- Netflix Prize: optimized accuracy → winning system was never deployed
+- Deep Blue "solved" chess while learning **nothing** about human cognition
+- By *fixing the task* you remove the need to handle novelty — you remove the need for **intelligence itself**
+
+:::: notes
+Tie this back to Chapter 18's validation-overfitting trap and to Goodhart's law. The theme rhymes across the book: the moment a metric becomes the target, it stops measuring what you cared about.
+::::
+
+
+## ARC-AGI: a test you can't study for
+
+- Tasks designed to be **genuinely novel** — like Raven's matrices, but no practice set
+- Everyone starts from the same innate "Core Knowledge priors"
+- 2024 ARC Prize forced a shift: **"scale is all you need" → "we need on-the-fly recombination"**
+- Winners all used **test-time adaptation** (test-time training or search)
+- OpenAI o3: **76%** at \$200/task, up to **88%** at huge cost — but *efficiency* is the point
+- **ARC-AGI-2** (2025): base LLMs back near **0%**
+
+
+## The missing ingredients: search & symbols
+
+| Value-centric abstraction | Program-centric abstraction |
+|:--|:--|
+| Similarity / distance | Exact structural match |
+| Perception, intuition | Reasoning, planning |
+| Immediate, fuzzy, approximate | Slow, exact, rigorous |
+| Needs lots of data | Works from few examples |
+| **Deep learning has this** | **Deep learning lacks this** |
+
+- Human cognition needs **both**; deep learning is "literally missing half"
+
+:::: notes
+Concrete anchor: sorting a list. A neural net struggles; ten lines of Python generalize perfectly. Flip it: classifying MNIST by hand-writing rules is misery; manifold-fitting is easy. The two abstraction types are good at *opposite* things — hence the need to blend them.
+::::
+
+
+## The long-term vision
+
+Chollet's sketch of a path to AGI:
+
+1. Models become **programs**, not just geometric transforms
+2. **Blend** algorithmic modules (reasoning, search, memory) with geometric ones (intuition)
+3. Models **grown** by modular synthesis, not hand-coded
+4. Discrete **program search** guided by deep-learning "program-space intuition"
+5. Result: human-like **extreme generalization** from minimal data
+6. A perpetually learning meta-system — AGI, no dystopia required
+
+:::: notes
+Whether or not you buy the roadmap, notice it's *constructive* — it names specific missing pieces (program synthesis, modular reuse, guided search) rather than just "more scale." Discussion: does hybrid neuro-symbolic feel like the future, or like the pendulum swinging back?
+::::
+
+
+# Chapter 20 · Conclusions
+
+## The nested definitions
+
+- **AI** — automating any human cognitive process
+- **Machine learning** — programs learned from data, not written by hand
+- **Deep learning** — long chains of geometric transformations in layers
+- **Generative AI** — self-supervised models that produce text / images / audio / video
+
+:::: notes
+A clean slide to reset vocabulary. Worth asking the group to place a few familiar systems (a spam filter, a chess engine, ChatGPT, a diffusion model) into these nested circles.
+::::
+
+
+## How to think about deep learning
+
+- The whole thing, in one line: *sufficiently large parametric models trained with gradient descent*
+- Everything is **geometric** — vectorize the data, uncrumple the manifold
+- Four things made it possible:
+  - Algorithmic advances (backprop → Transformers)
+  - Internet-scale datasets
+  - Parallel GPU hardware
+  - Software (CUDA, TensorFlow, JAX, PyTorch, Keras)
+
+
+## The universal ML workflow
+
+1. Define the problem & the data
+2. Choose a reliable **success metric**
+3. Split train / validation / test
+4. Vectorize & preprocess
+5. Beat a **common-sense baseline**
+6. Refine: tune hyperparameters, regularize
+7. **Deploy** and monitor
+
+- Golden rule: tune on validation, judge on test
+
+:::: notes
+This is the spine of the whole book (Chapter 6). If someone forgets everything else, this list is what to keep. Ask: which step do people actually skip in practice? (Usually the baseline, or the monitoring.)
+::::
+
+
+## The architecture cheat sheet
+
+| Input | Output | Architecture |
+|:--|:--|:--|
+| Vector data | Class / regression | Dense network |
+| Timeseries | Class / regression | RNN or Transformer |
+| Images | Class / regression | ConvNet |
+| Text | Class / regression | Transformer |
+| Text + images | Text | Transformer |
+| Text + images | Images | VAE or Diffusion |
+
+:::: notes
+A nice "what did we actually cover" moment — nearly every row maps to a chapter and a past slide deck. Good place to poll which architecture each person found most useful.
+::::
+
+
+## Limitations, one more time
+
+Deep nets are **interpolative databases of patterns**:
+
+- Struggle to adapt to **novelty** (frozen parameters)
+- Sensitive to **superficial** variation (phrasing, adversarial noise)
+- Weak at **discrete algorithmic reasoning**
+
+Scale alone hasn't delivered general intelligence — the road ahead is **hybrid**: pattern recognition **+** symbolic programs.
+
+
+## Staying up to date
+
+- **Kaggle** — practice on live problems; ensembles and real data
+- **arXiv** — read preprints; track authors via Google Scholar
+- **Keras ecosystem** — keras.io docs, code examples, source
+
+> Learning is a lifelong journey — especially in AI, where the unknowns still vastly outnumber the certainties.
+
+
+## Takeaways from the whole book
+
+- You can now **build**: classify, detect, segment, forecast, generate, translate, fine-tune
+- You can now **engineer**: tune, ensemble, scale, quantize for the real world
+- You can now **reason about the field**: what deep learning is, and where its edges are
+- The most important skill isn't any one model — it's the **workflow** and the judgment around it
+
+:::: notes
+Closing prompt — bring it back to the opening question: over 20 chapters, what will you actually use, and what most changed your mental model? And after Chapter 19: are you more optimistic or more skeptical about the path to real intelligence than when we started?
+::::
