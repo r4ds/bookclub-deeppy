@@ -112,7 +112,7 @@ final_preds = 0.5*preds_a + 0.25*preds_b + 0.1*preds_c + 0.15*preds_d  # learned
 - Can **combine** both (e.g. split across 4 GPUs, replicate ×2 → 8 devices)
 
  
-## Lower-precision computation
+## Lower precision & mixed precision {.smaller}
 
 | Type | Bits | Resolution |
 |:--|:--|:--|
@@ -123,14 +123,8 @@ final_preds = 0.5*preds_a + 0.25*preds_b + 0.1*preds_c + 0.15*preds_d  # learned
 
 - Modern GPUs/TPUs have **dedicated 16-bit hardware** → ~2× faster, half the memory
 - But pure float16 **can't** represent the tiny updates gradient descent needs
-
-
-## Mixed precision & loss scaling
- 
-- Compute in **float16**, store & update weights in **float32** — best of both
-- Each layer has a `compute_dtype` (float16) and `variable_dtype` (float32)
-- **Loss scaling**: multiply the loss so small gradients don't underflow to zero
-  - `LossScaleOptimizer(...)` adjusts the factor automatically
+- **Mixed precision**: compute in float16, store & update weights in float32
+- **Loss scaling**: multiply the loss so small gradients don't underflow to zero (`LossScaleOptimizer` auto-tunes it)
 
 
 ## Faster inference: int8 quantization
@@ -177,7 +171,7 @@ Set expectations: this chapter is opinionated. Chollet is the author of Keras *a
 - **Adversarial examples**: an imperceptible pixel change → panda classified as gibbon
 - LLMs: rename a variable or tweak a number and performance can **collapse**
 - The "Alice in Wonderland" riddle breaks when N and M drift from common values
-- "prompt engineering": minor changes and tank performanece!
+- "Prompt engineering" = searching for phrasings that *don't* tank performance
 
 :::: notes
 Reframe for discussion: "prompt engineering" is often sold as *your model is smarter than you know*. Chollet's read is the opposite — *there's a range of tiny changes that can tank performance, and you're searching to avoid them.* Which framing matches people's real experience?
@@ -196,18 +190,6 @@ Reframe for discussion: "prompt engineering" is often sold as *your model is sma
 - Models lack the sensorimotor grounding behind human understanding
 
 "Never fall into the trap of believing that neural networks understand the task they perform."
-
-
-## Scale isn't all you need
-
-- 2023 story: just scale up, and AGI *emerges*
-- Reality: the benchmarks are largely **memorization tests**
-- Since 2017, ~**50,000×** more scale moved 2019 ARC-AGI from **0% → ~10%**
-- Same architecture (Transformer curve-fitting) → same fundamental ceiling
-
-:::: notes
-The number to sit with: 50,000× scale for a ~10-point gain on a test of genuine novelty. Contrast with how fast scale improved *memorization* benchmarks. This is the empirical core of the "scale isn't enough" argument.
-::::
 
 
 ## Local vs. extreme generalization
@@ -235,12 +217,6 @@ The provocation: calling today's systems "artificial intelligence" is, for Choll
 ::::
 
 
-## The kaleidoscope hypothesis
-
-- The world's infinite variety = recombination of a few **"atoms of meaning"**
-- Intelligence = **acquire** compact reusable abstractions + **recombine** them for novelty
-- Efficiency is the whole game: *how good are the abstractions you extract from limited experience?*
-
 ## Setting the wrong target
 
 - **The shortcut rule**: optimize one metric → everything not measured gets ignored
@@ -262,6 +238,10 @@ Tie this back to Chapter 18's validation-overfitting trap and to Goodhart's law.
 - Winners all used **test-time adaptation** (test-time training or search)
 - OpenAI o3: **76%** at \$200/task, up to **88%** at huge cost — but *efficiency* is the point
 - **ARC-AGI-2** (2025): base LLMs back near **0%**
+
+:::: notes
+The empirical core of "scale isn't enough": since 2017, ~50,000× more scale moved 2019 ARC-AGI only from 0% → ~10% — same Transformer curve-fitting, same ceiling. Contrast with how fast scale improved *memorization* benchmarks.
+::::
 
 
 ## The missing ingredients: search & symbols
@@ -318,27 +298,20 @@ The payoff question for the group: does agentic AI *validate* Chollet — search
 
 # Chapter 20 · Conclusions
 
-## The nested definitions
+## What deep learning is {.smaller}
+
+The nested definitions:
 
 - **AI** — automating any human cognitive process
 - **Machine learning** — programs learned from data, not written by hand
 - **Deep learning** — long chains of geometric transformations in layers
 - **Generative AI** — self-supervised models that produce text / images / audio / video
 
+In one line: *sufficiently large parametric models trained with gradient descent* — everything **geometric**: vectorize the data, uncrumple the manifold. Made possible by algorithmic advances (backprop → Transformers), internet-scale data, GPUs, and software (CUDA, TF, JAX, PyTorch, Keras).
+
 :::: notes
 A clean slide to reset vocabulary. Worth asking the group to place a few familiar systems (a spam filter, a chess engine, ChatGPT, a diffusion model) into these nested circles.
 ::::
-
-
-## How to think about deep learning
-
-- The whole thing, in one line: *sufficiently large parametric models trained with gradient descent*
-- Everything is **geometric** — vectorize the data, uncrumple the manifold
-- Four things made it possible:
-  - Algorithmic advances (backprop → Transformers)
-  - Internet-scale datasets
-  - Parallel GPU hardware
-  - Software (CUDA, TensorFlow, JAX, PyTorch, Keras)
 
 
 ## The universal ML workflow
@@ -374,17 +347,6 @@ A nice "what did we actually cover" moment — nearly every row maps to a chapte
 ::::
 
 
-## Limitations, one more time
-
-Deep nets are **interpolative databases of patterns**:
-
-- Struggle to adapt to **novelty** (frozen parameters)
-- Sensitive to **superficial** variation (phrasing, adversarial noise)
-- Weak at **discrete algorithmic reasoning**
-
-Scale alone hasn't delivered general intelligence — the road ahead is **hybrid**: pattern recognition **+** symbolic programs.
-
-
 ## Staying up to date
 
 - **Kaggle** — practice on live problems; ensembles and real data
@@ -399,6 +361,7 @@ Scale alone hasn't delivered general intelligence — the road ahead is **hybrid
 - You can now **build**: classify, detect, segment, forecast, generate, translate, fine-tune
 - You can now **engineer**: tune, ensemble, scale, quantize for the real world
 - You can now **reason about the field**: what deep learning is, and where its edges are
+- Scale alone hasn't delivered general intelligence — the road ahead looks **hybrid**: pattern recognition **+** symbolic programs
 - The most important skill isn't any one model — it's the **workflow** and the judgment around it
 
 :::: notes
