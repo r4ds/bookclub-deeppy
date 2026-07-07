@@ -2,19 +2,17 @@
 title: Best practices, the future of AI, and conclusions
 ---
 
-## Learning objectives
-
--   Tune hyperparameters and ensemble models to squeeze more out of what you build
--   Scale training across GPUs/TPUs and use lower precision to train and serve faster
--   Understand *why* deep learning is powerful — and where it fundamentally falls short
--   Place deep learning on the spectrum of generalization, and see what a path to real intelligence might look like
--   Leave with a map of the whole book: the workflow, the architectures, and how to keep learning
-
 ## Wrapping up: three "big picture" chapters
 
-- **Chapter 18** — what is needed to scale a proof of concept to a real-world model
-- **Chapter 19** — Chollet's argument for what deep learning is and isn't
-- **Chapter 20** — a bird's-eye review of everything, and where to go next
+- **Chapter 18: Best practices for the real world**
+
+    What is needed to scale a proof of concept to a real-world model
+- **Chapter 19: The future of AI**
+
+    Chollet's argument for what deep learning is and isn't
+- **Chapter 20: Conclusions**
+
+    A bird's-eye review of everything, and where to go next
 - Less code this week, more **discussion** — this is our last session
 
 :::: notes
@@ -352,15 +350,7 @@ A nice "what did we actually cover" moment — nearly every row maps to a chapte
 
 > Learning is a lifelong journey — especially in AI, where the unknowns still vastly outnumber the certainties.
 
-
-## Takeaways from the whole book
-
-- You can now **build**: classify, detect, segment, forecast, generate, translate, fine-tune
-- You can now **engineer**: tune, ensemble, scale, quantize for the real world
-- You can now **reason about the field**: what deep learning is, and where its edges are
-- Scale alone hasn't delivered general intelligence — the road ahead looks **hybrid**: pattern recognition **+** symbolic programs
-- The most important skill isn't any one model — it's the **workflow** and the judgment around it
-
+ 
 :::: notes
 Closing prompt — bring it back to the opening question: over 20 chapters, what will you actually use, and what most changed your mental model? And after Chapter 19: are you more optimistic or more skeptical about the path to real intelligence than when we started?
 ::::
