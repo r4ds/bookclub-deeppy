@@ -12,7 +12,7 @@ As we read, we are producing [slides about the book](https://dslc.io/deeppy).
 
 If you would like to present, please see the sign-up sheet for your cohort (linked below, and pinned in the [#book_club-deeppy](https://dslcio.slack.com/archives/C09PYM1R332) channel on Slack)!
 
-- [Cohort 1](https://docs.google.com/spreadsheets/d/19WyyME0GQ_5eREP0NheEQ79aiKIsTST_tgFl3uwvk5c/edit?usp=sharing) (started 2026-01-19, facilitated by Ron Legere): [Mondays, 3:00 PM CST/CDT](https://www.timeanddate.com/worldclock/converter.html?iso=20260119T210000&p1=24&p2=1440) | [meeting videos](https://www.youtube.com/playlist?list=PL3x6DOfs2NGiCpNDZcbn5CJej2rT8xcZX)
+- Cohort 1 (started 2026-01-19, ended 2026-07-07): [meeting videos](https://www.youtube.com/playlist?list=PL3x6DOfs2NGiCpNDZcbn5CJej2rT8xcZX)
 
 <hr>
 
