@@ -10,33 +10,43 @@
     ]
   },
   {
-    "objectID": "12.html",
-    "href": "12.html",
-    "title": "12. Object detection",
+    "objectID": "15.html",
+    "href": "15.html",
+    "title": "15. Language models and the Transformer",
     "section": "",
-    "text": "Object detection\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "Language models and the Transformer\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "12. Object detection"
+      "15. Language models and the Transformer"
     ]
   },
   {
-    "objectID": "08.html",
-    "href": "08.html",
-    "title": "8. Image classification",
+    "objectID": "10.html",
+    "href": "10.html",
+    "title": "10. Interpreting what ConvNets learn",
     "section": "",
-    "text": "Image classification\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "Interpreting what ConvNets learn\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "8. Image classification"
+      "10. Interpreting what ConvNets learn"
     ]
   },
   {
-    "objectID": "02.html",
-    "href": "02.html",
-    "title": "2. The mathematical building blocks of neural networks",
+    "objectID": "05.html",
+    "href": "05.html",
+    "title": "5. Fundamentals of machine learning",
     "section": "",
-    "text": "The mathematical building blocks of neural networks\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "Fundamentals of machine learning\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "2. The mathematical building blocks of neural networks"
+      "5. Fundamentals of machine learning"
+    ]
+  },
+  {
+    "objectID": "01.html",
+    "href": "01.html",
+    "title": "1. What is deep learning?",
+    "section": "",
+    "text": "What is deep learning?\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "crumbs": [
+      "1. What is deep learning?"
     ]
   },
   {
@@ -1000,43 +1010,225 @@
     "text": "Takeaways\n\nObject detection localizes objects with boxes, labels, and confidence scores\nSingle-stage detectors make detection a fast, dense prediction problem\nYOLO teaches the core representation: grid cells predict boxes and classes\nIoU connects localization quality to training and evaluation\nPretrained multi-scale detectors such as RetinaNet are usually the practical starting point\n\n\nGood closing prompt: after chapters 8-12, the group has seen classification, interpretation, segmentation, and detection. Which vision task feels most useful for your work, and which feels hardest to evaluate?"
   },
   {
-    "objectID": "01.html",
-    "href": "01.html",
-    "title": "1. What is deep learning?",
+    "objectID": "slides/18-20.html#wrapping-up-three-big-picture-chapters",
+    "href": "slides/18-20.html#wrapping-up-three-big-picture-chapters",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "Wrapping up: three “big picture” chapters",
+    "text": "Wrapping up: three “big picture” chapters\n\nChapter 18: Best practices for the real world\nWhat is needed to scale a proof of concept to a real-world model\nChapter 19: The future of AI\nChollet’s argument for what deep learning is and isn’t\nChapter 20: Conclusions\nA bird’s-eye review of everything, and where to go next\nLess code this week, more discussion — this is our last session\n\n\nOpening prompt for the group: after 20 chapters, what’s the one capability you’re most likely to actually use at work — and the one idea that most changed how you think about ML? We’ll come back to this at the end."
+  },
+  {
+    "objectID": "slides/18-20.html#getting-the-most-out-of-your-models",
+    "href": "slides/18-20.html#getting-the-most-out-of-your-models",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "Getting the most out of your models",
+    "text": "Getting the most out of your models\nSqueezing more performance:\n\nHyperparameter tuning — systematic search\nModel ensembling — combine diverse models into one better predictor\n\nTraining & serving faster:\n\nParallelize across multiple devices\nLower-precision computation"
+  },
+  {
+    "objectID": "slides/18-20.html#parameters-vs.-hyperparameters",
+    "href": "slides/18-20.html#parameters-vs.-hyperparameters",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "Parameters vs. hyperparameters",
+    "text": "Parameters vs. hyperparameters\n\n\n\n\n\n\n\n\n\nSet by\nExample\n\n\n\n\nParameters\nBackpropagation\nLayer weights\n\n\nHyperparameters\nExperience and/or search\n# units, # layers, learning rate\n\n\n\n\nHyperparameter space is often discrete and non-differentiable — no gradient descent\nNeed gradient-free search: build → train → measure val → pick next → repeat"
+  },
+  {
+    "objectID": "slides/18-20.html#kerastuner",
+    "href": "slides/18-20.html#kerastuner",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "KerasTuner",
+    "text": "KerasTuner\n\nReplace hardcoded values with ranges:\n\nInt(name=\"units\", min_value=16, max_value=64, step=16)\nAlso Float, Boolean, Choice\n\nWrap your model in a function taking hp, or subclass HyperModel\nPick a search strategy:\n\n\n\n\nTuner\nIdea\n\n\n\n\nGridSearch\nTry every combination\n\n\nRandomSearch\nSample the space at random\n\n\nBayesianOptimization\nBalance exploit vs explore\n\n\n\n\nThe mechanics matter less than the mindset: tuning turns “I’ll just pick 32 units” into a measured decision. executions_per_trial trains each config more than once to average out random-seed variance — worth mentioning why that’s needed."
+  },
+  {
+    "objectID": "slides/18-20.html#the-validation-set-overfitting-trap",
+    "href": "slides/18-20.html#the-validation-set-overfitting-trap",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "The validation-set overfitting trap",
+    "text": "The validation-set overfitting trap\n\nEvery time you tune on the validation set, you leak information about it\nHyperparameters start to overfit the validation data…\nDefense: keep the test set untouched until the very end\n\n\nThis is the same leakage idea from Chapter 5, one level up. First we overfit training data with parameters; now we can overfit validation data with hyperparameters. Ask the group where else this “optimizing on your yardstick” pattern shows up (Goodhart’s law — foreshadows the “shortcut rule” in Ch.19)."
+  },
+  {
+    "objectID": "slides/18-20.html#model-ensembling",
+    "href": "slides/18-20.html#model-ensembling",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "Model ensembling",
+    "text": "Model ensembling\n\nPool predictions from multiple models\n“Blind men and the elephant”: different models capture different facets\n\nfinal_preds = 0.25 * (preds_a + preds_b + preds_c + preds_d)   # equal\nfinal_preds = 0.5*preds_a + 0.25*preds_b + 0.15*preds_c + 0.1*preds_d  # learned weights\n\nWeights tuned on validation (random search / Nelder–Mead)"
+  },
+  {
+    "objectID": "slides/18-20.html#diversity-beats-individual-quality",
+    "href": "slides/18-20.html#diversity-beats-individual-quality",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "Diversity beats individual quality",
+    "text": "Diversity beats individual quality\n\nRetraining the same net with new seeds → tiny gains\nMixing fundamentally different methods (trees + neural nets) → big gains\nA weaker model with a unique perspective can still help the ensemble\nExample: Chollet’s own 4th-place entry in the 2014 Higgs Boson challenge combined tree models (XGBoost) and deep nets"
+  },
+  {
+    "objectID": "slides/18-20.html#scaling-up-data-vs.-model-parallelism",
+    "href": "slides/18-20.html#scaling-up-data-vs.-model-parallelism",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "Scaling up: data vs. model parallelism",
+    "text": "Scaling up: data vs. model parallelism\n\n\n\n\n\n\n\n\nStrategy\nWhat’s split\nWhen\n\n\n\n\nData parallelism\nThe batch\nModel fits on one device (common case)\n\n\nModel parallelism\nThe model\nModel too big for one device\n\n\n\n\nData parallel: replicate model, each device gets a sub-batch, average gradients\nModel parallel: split layers or split within a layer\nCan combine both (e.g. split across 4 GPUs, replicate ×2 → 8 devices)"
+  },
+  {
+    "objectID": "slides/18-20.html#lower-precision-mixed-precision",
+    "href": "slides/18-20.html#lower-precision-mixed-precision",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "Lower precision & mixed precision",
+    "text": "Lower precision & mixed precision\n\n\n\nType\nBits\nResolution\n\n\n\n\nfloat32\n32\n~1e-7 (the default)\n\n\nfloat16\n16\n~1e-3\n\n\nbfloat16\n16\nwider range, coarser\n\n\nint8\n8\ninteger inference\n\n\n\n\nModern GPUs/TPUs have dedicated 16-bit hardware → ~2× faster, half the memory\nBut pure float16 can’t represent the tiny updates gradient descent needs\nMixed precision: compute in float16, store & update weights in float32\nLoss scaling: multiply the loss so small gradients don’t underflow to zero (LossScaleOptimizer auto-tunes it)"
+  },
+  {
+    "objectID": "slides/18-20.html#faster-inference-int8-quantization",
+    "href": "slides/18-20.html#faster-inference-int8-quantization",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "Faster inference: int8 quantization",
+    "text": "Faster inference: int8 quantization\nmodel.quantize(\"int8\")   # Dense, EinsumDense, Embedding\n\nConvert trained float32 weights → int8 for deployment\nScale into [-127, 127], integer matmul, unscale — only rounding error lost\nFaster than even float16\n(float8 exists too — but only pays off for 5B+ param models on H100s)\n\n\nThis is the “make it real” section: mixed precision for training, int8 for serving. Ask the group who has actually deployed a model and hit latency/cost walls — this is where these knobs earn their keep."
+  },
+  {
+    "objectID": "slides/18-20.html#the-core-claim",
+    "href": "slides/18-20.html#the-core-claim",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "The core claim",
+    "text": "The core claim\n\nDeep learning models are vast, interpolative databases of patterns — not reasoning engines.\n\n\nThey freeze after training: a static chain of continuous geometric transforms\nBrilliant within the training distribution; brittle outside it\nThe rest of the chapter is Chollet’s opinion on what that means.\n\n\nSet expectations: this chapter is opinionated. Chollet is the author of Keras and the creator of the ARC benchmark — he has a specific thesis. Worth reading it as a strong argument to engage with, not settled fact. Where do people agree/disagree?"
+  },
+  {
+    "objectID": "slides/18-20.html#limitation-1-struggle-with-novelty",
+    "href": "slides/18-20.html#limitation-1-struggle-with-novelty",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "Limitation 1 — struggle with novelty",
+    "text": "Limitation 1 — struggle with novelty\n\nParameters are frozen; a distribution shift has no recovery mechanism\nIn-context “learning” = fetching a memorized vector program, not acquiring a new skill\n“10 kg of steel vs 1 kg of feathers?” → “they weigh the same” — pattern-matched to the memorized trick question\nMaintenance is whack-a-mole"
+  },
+  {
+    "objectID": "slides/18-20.html#limitation-2-sensitivity-to-phrasing",
+    "href": "slides/18-20.html#limitation-2-sensitivity-to-phrasing",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "Limitation 2 — sensitivity to phrasing",
+    "text": "Limitation 2 — sensitivity to phrasing\n\nAdversarial examples: an imperceptible pixel change → panda classified as gibbon\nLLMs: rename a variable or tweak a number and performance can collapse\nThe “Alice in Wonderland” riddle breaks when N and M drift from common values\n“Prompt engineering” = searching for phrasings that don’t tank performance\n\n\nReframe for discussion: “prompt engineering” is often sold as your model is smarter than you know. Chollet’s read is the opposite — there’s a range of tiny changes that can tank performance, and you’re searching to avoid them. Which framing matches people’s real experience?"
+  },
+  {
+    "objectID": "slides/18-20.html#limitation-3-cant-learn-general-programs",
+    "href": "slides/18-20.html#limitation-3-cant-learn-general-programs",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "Limitation 3 — can’t learn general programs",
+    "text": "Limitation 3 — can’t learn general programs\n\n~70% accuracy on digit addition after millions of examples\nPlace-value logic is discrete; continuous geometric transforms are a poor fit\nMost programs simply can’t be expressed as a smooth manifold"
+  },
+  {
+    "objectID": "slides/18-20.html#the-anthropomorphizing-trap",
+    "href": "slides/18-20.html#the-anthropomorphizing-trap",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "The anthropomorphizing trap",
+    "text": "The anthropomorphizing trap\n\nWe project theory of mind onto anything that uses language\nModels lack the sensorimotor grounding behind human understanding\n\n\n“Never fall into the trap of believing that neural networks understand the task they perform.”"
+  },
+  {
+    "objectID": "slides/18-20.html#local-vs.-extreme-generalization",
+    "href": "slides/18-20.html#local-vs.-extreme-generalization",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "Local vs. extreme generalization",
+    "text": "Local vs. extreme generalization\n\n\n\n\nLocal generalization\nExtreme generalization\n\n\n\n\nWho\nDeep nets\nHumans, advanced animals\n\n\nHow\nInterpolate on the data manifold\nAbstraction & reasoning\n\n\nHandles\n“Known unknowns”\n“Unknown unknowns”\n\n\nData need\nMillions of examples\nA handful\n\n\n\n\nHumans derive rocket equations; nets need millions of trials and thousands of crashes"
+  },
+  {
+    "objectID": "slides/18-20.html#what-is-intelligence-for",
+    "href": "slides/18-20.html#what-is-intelligence-for",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "What is intelligence for?",
+    "text": "What is intelligence for?\n\nThe ability to efficiently use the information at your disposal to produce successful behavior in the face of an uncertain, ever-changing future.\n\n\nBrains started as automatons — reactive if/then programs (insect-like)\nIntelligence evolved to generate behavior on the fly for novel situations\nDeep nets are sophisticated automatons → cognitive automation, not autonomy\n\n\nThe provocation: calling today’s systems “artificial intelligence” is, for Chollet, a category error — they’re automation. Is that a useful distinction, or moving the goalposts? Good place to let the group push back."
+  },
+  {
+    "objectID": "slides/18-20.html#setting-the-wrong-target",
+    "href": "slides/18-20.html#setting-the-wrong-target",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "Setting the wrong target",
+    "text": "Setting the wrong target\n\nThe shortcut rule: optimize one metric → everything not measured gets ignored\nNetflix Prize: optimized accuracy (RMSE) → winning system too complex to deploy\nDeep Blue “solved” chess while learning nothing about human cognition\nBy fixing the task you remove the need to handle novelty — you remove the need for intelligence itself\n\n\nTie this back to Chapter 18’s validation-overfitting trap and to Goodhart’s law. The theme rhymes across the book: the moment a metric becomes the target, it stops measuring what you cared about."
+  },
+  {
+    "objectID": "slides/18-20.html#arc-agi-a-test-you-cant-study-for",
+    "href": "slides/18-20.html#arc-agi-a-test-you-cant-study-for",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "ARC-AGI: a test you can’t study for",
+    "text": "ARC-AGI: a test you can’t study for\n\nARC example\nTasks designed to be genuinely novel\n2024 ARC Prize forced a shift: “scale is all you need” → “we need on-the-fly recombination”\nWinners all used test-time adaptation (test-time training or search)\nOpenAI o3: 76% at $200/task, up to 88% at huge cost — but efficiency is the point\n\n\nThe empirical core of “scale isn’t enough”: since 2017, ~50,000× more scale moved 2019 ARC-AGI only from 0% → ~10% — same Transformer curve-fitting, same ceiling. Contrast with how fast scale improved memorization benchmarks."
+  },
+  {
+    "objectID": "slides/18-20.html#the-missing-ingredients-search-symbols",
+    "href": "slides/18-20.html#the-missing-ingredients-search-symbols",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "The missing ingredients: search & symbols",
+    "text": "The missing ingredients: search & symbols\n\n\n\nValue-centric abstraction\nProgram-centric abstraction\n\n\n\n\nSimilarity / distance\nExact structural match\n\n\nPerception, intuition\nReasoning, planning\n\n\nImmediate, fuzzy, approximate\nSlow, exact, rigorous\n\n\nNeeds lots of data\nWorks from few examples\n\n\nDeep learning has this\nDeep learning lacks this\n\n\n\n\nHuman cognition needs both; deep learning is “literally missing half”\n\n\nConcrete anchor: sorting a list. A neural net struggles; ten lines of Python generalize perfectly. Flip it: classifying MNIST by hand-writing rules is misery; manifold-fitting is easy. The two abstraction types are good at opposite things — hence the need to blend them."
+  },
+  {
+    "objectID": "slides/18-20.html#the-long-term-vision",
+    "href": "slides/18-20.html#the-long-term-vision",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "The long-term vision",
+    "text": "The long-term vision\nChollet’s sketch of a path to AGI:\n\nModels become programs, not just geometric transforms\nBlend algorithmic modules (reasoning, search, memory) with geometric ones (intuition) — grown by modular synthesis, not hand-coded\nDiscrete program search guided by deep-learning “program-space intuition”\nResult: a perpetually learning meta-system with human-like extreme generalization from minimal data — AGI, no dystopia required\n\n\nWhether or not you buy the roadmap, notice it’s constructive — it names specific missing pieces (program synthesis, modular reuse, guided search) rather than just “more scale.” Discussion: does hybrid neuro-symbolic feel like the future, or like the pendulum swinging back?"
+  },
+  {
+    "objectID": "slides/18-20.html#since-the-book-is-the-gap-closing",
+    "href": "slides/18-20.html#since-the-book-is-the-gap-closing",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "Since the book: is the gap closing?",
+    "text": "Since the book: is the gap closing?\nAgentic AI & reasoning models (o-series, extended thinking, tool use, code execution)\n\nChain-of-thought is a form of search; tool/code calls borrow real programs\nLooks like Chollet’s “blend of geometric intuition + algorithmic modules”…\n…but as external scaffolding around the same LLM core — not a grown, learned system\n\nARC-AGI keeps moving\n\nARC-AGI-1 (2019) → cracked by o3 + test-time adaptation\nARC-AGI-2 (2025) → resists brute force; still hard for frontier models\nARC-AGI-3 (previewed 2025) → interactive, agentic tasks — planning over many steps\n\n\nThe payoff question for the group: does agentic AI validate Chollet — search and symbols really were the missing pieces, and bolting them on helps — or does it dodge him: still an interpolative core with hand-built scaffolding, so his “automaton, not agent” line hasn’t budged? And is ARC’s versioning “moving the goalposts,” or proof that each version was gameable? Let people land their own verdict — this is the live edge of the book."
+  },
+  {
+    "objectID": "slides/18-20.html#what-deep-learning-is",
+    "href": "slides/18-20.html#what-deep-learning-is",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "What deep learning is",
+    "text": "What deep learning is\nThe nested definitions:\n\nAI — automating any human cognitive process\nMachine learning — programs learned from data, not written by hand\nDeep learning — long chains of geometric transformations in layers\nGenerative AI — self-supervised models that produce text / images / audio / video\n\nIn one line: sufficiently large parametric models trained with gradient descent — everything geometric: vectorize the data, uncrumple the manifold.\n\nA clean slide to reset vocabulary. What made it all possible: algorithmic advances (backprop → Transformers), internet-scale data, GPUs, and software (CUDA, TF, JAX, PyTorch, Keras). Worth asking the group to place a few familiar systems (a spam filter, a chess engine, ChatGPT, a diffusion model) into these nested circles."
+  },
+  {
+    "objectID": "slides/18-20.html#the-universal-ml-workflow",
+    "href": "slides/18-20.html#the-universal-ml-workflow",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "The universal ML workflow",
+    "text": "The universal ML workflow\n\nDefine the problem & the data\nChoose a reliable success metric\nSplit train / validation / test\nVectorize & preprocess\nBeat a common-sense baseline\nRefine: tune hyperparameters, regularize\nDeploy and monitor\n\n\nGolden rule: tune on validation, judge on test\n\n\nThis is the spine of the whole book (Chapter 6). If someone forgets everything else, this list is what to keep. Ask: which step do people actually skip in practice? (Usually the baseline, or the monitoring.)"
+  },
+  {
+    "objectID": "slides/18-20.html#the-architecture-cheat-sheet",
+    "href": "slides/18-20.html#the-architecture-cheat-sheet",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "The architecture cheat sheet",
+    "text": "The architecture cheat sheet\n\n\n\nInput\nOutput\nArchitecture\n\n\n\n\nVector data\nClass / regression\nDense network\n\n\nTimeseries\nClass / regression\nRNN or Transformer\n\n\nImages\nClass / regression\nConvNet\n\n\nText\nClass / regression\nTransformer\n\n\nText + images\nText\nTransformer\n\n\nText + images\nImages\nVAE or Diffusion\n\n\n\n\nA nice “what did we actually cover” moment — nearly every row maps to a chapter and a past slide deck. Good place to poll which architecture each person found most useful."
+  },
+  {
+    "objectID": "slides/18-20.html#staying-up-to-date",
+    "href": "slides/18-20.html#staying-up-to-date",
+    "title": "Best practices, the future of AI, and conclusions",
+    "section": "Staying up to date",
+    "text": "Staying up to date\n\nKaggle — practice on live problems; ensembles and real data\narXiv — read preprints; track authors via Google Scholar\nKeras ecosystem — keras.io docs, code examples, source\n\n\nLearning is a lifelong journey — especially in AI, where the unknowns still vastly outnumber the certainties.\n\n\nClosing prompt — bring it back to the opening question: over 20 chapters, what will you actually use, and what most changed your mental model? And after Chapter 19: are you more optimistic or more skeptical about the path to real intelligence than when we started?"
+  },
+  {
+    "objectID": "02.html",
+    "href": "02.html",
+    "title": "2. The mathematical building blocks of neural networks",
     "section": "",
-    "text": "What is deep learning?\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "The mathematical building blocks of neural networks\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "1. What is deep learning?"
+      "2. The mathematical building blocks of neural networks"
     ]
   },
   {
-    "objectID": "05.html",
-    "href": "05.html",
-    "title": "5. Fundamentals of machine learning",
+    "objectID": "08.html",
+    "href": "08.html",
+    "title": "8. Image classification",
     "section": "",
-    "text": "Fundamentals of machine learning\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "Image classification\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "5. Fundamentals of machine learning"
+      "8. Image classification"
     ]
   },
   {
-    "objectID": "10.html",
-    "href": "10.html",
-    "title": "10. Interpreting what ConvNets learn",
+    "objectID": "12.html",
+    "href": "12.html",
+    "title": "12. Object detection",
     "section": "",
-    "text": "Interpreting what ConvNets learn\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "Object detection\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "10. Interpreting what ConvNets learn"
+      "12. Object detection"
     ]
   },
   {
-    "objectID": "15.html",
-    "href": "15.html",
-    "title": "15. Language models and the Transformer",
+    "objectID": "18-20.html",
+    "href": "18-20.html",
+    "title": "18-20. Best practices for the real world/The Future of AI / Conclusions",
     "section": "",
-    "text": "Language models and the Transformer\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
+    "text": "Best practices, the future of AI, and conclusions\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
-      "15. Language models and the Transformer"
+      "18-20. Best practices for the real world/The Future of AI / Conclusions"
     ]
   }
 ]
